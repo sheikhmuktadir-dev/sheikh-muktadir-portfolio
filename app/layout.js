@@ -1,8 +1,4 @@
-import {
-  Schibsted_Grotesk,
-  DM_Mono,
-  Big_Shoulders,
-} from "next/font/google";
+import localFont from "next/font/local";
 import "./styles/globals.css";
 
 import SmoothScroll from "@/components/SmoothScroll";
@@ -12,28 +8,44 @@ import Nav from "@/components/Nav";
 import FxLayer from "@/components/fx/FxLayer";
 import { site } from "@/data/site";
 
-// Headings and body — tight tracking, sub-1 line height on display sizes.
-const schibsted = Schibsted_Grotesk({
-  subsets: ["latin"],
-  // No weight array -> the VARIABLE font. Required: the reference sets the
-  // wght axis to 666, which a static 400/500/600 file cannot express.
+// Fonts are self-hosted from ./fonts rather than fetched via next/font/google.
+// The Google loader downloads the woff2 files at BUILD time, and that fetch is
+// not reliable from CI build machines -- it failed the first Vercel deploy.
+// These are the exact latin-subset files Google was serving, so rendering is
+// unchanged; the build now makes no network call.
+
+// Headings and body -- tight tracking, sub-1 line height on display sizes.
+// The VARIABLE file: the reference sets the wght axis to 666, which a static
+// 400/500/600 file cannot express.
+const schibsted = localFont({
+  src: "./fonts/SchibstedGrotesk-Variable.woff2",
+  weight: "400 900",
+  style: "normal",
   variable: "--font-schibsted",
   display: "swap",
+  adjustFontFallback: "Arial",
 });
 
-// Small UI labels, tags and buttons — the reference uses DM Mono for all of
+// Small UI labels, tags and buttons -- the reference uses DM Mono for all of
 // these, which is what gives the nav and pills their monospaced look.
-const dmMono = DM_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
+const dmMono = localFont({
+  src: [
+    { path: "./fonts/DMMono-400.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/DMMono-500.woff2", weight: "500", style: "normal" },
+  ],
   variable: "--font-dm-mono",
   display: "swap",
+  adjustFontFallback: "Arial",
+  fallback: ["ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
 });
 
 // The oversized condensed wordmark.
-const bigShoulders = Big_Shoulders({
-  subsets: ["latin"],
-  weight: ["300", "600", "900"],
+const bigShoulders = localFont({
+  src: [
+    { path: "./fonts/BigShoulders-Variable.woff2", weight: "300", style: "normal" },
+    { path: "./fonts/BigShoulders-Variable.woff2", weight: "600", style: "normal" },
+    { path: "./fonts/BigShoulders-Variable.woff2", weight: "900", style: "normal" },
+  ],
   variable: "--font-big-shoulders",
   display: "swap",
   // Next has no fallback metrics for this family; computing a size-adjust

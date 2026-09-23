@@ -1,0 +1,383 @@
+/* ===========================================================================
+   FX — the motion layer.
+
+   Everything here is additive: transforms, opacity, blends and pseudo
+   elements. No rule in this file changes a box size, a grid track or a flow
+   position, so the finished layout is exactly the layout that was signed off.
+
+   Z-INDEX LADDER (the whole app — keep new layers inside it)
+     200  .preloader           intro curtain
+     120  .cursor-dot/ring     custom cursor  ·  .nav__overlay  mobile menu
+     118  .fx-sheen/.fx-layer  THIS FILE — always below the cursor
+     110  .nav__menu-btn
+     100  .nav
+     0-6  page sections (phone rail, stat cards, quote marks)
+
+   Both fixed layers here are `pointer-events: none` and clip their own
+   overflow, so they can never intercept a click or widen the document.
+   =========================================================================== */
+
+/* --- Pointer sheen --------------------------------------------------------
+   A soft light trailing the cursor. It must be a TOP-LEVEL fixed element, not
+   a child of .fx-layer: an element with a z-index starts a stacking context,
+   and mix-blend-mode only blends against the backdrop of its own context --
+   nested inside another positioned layer it would blend with nothing and
+   simply paint a white blob. */
+.fx-sheen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 118;
+  width: 520px;
+  height: 520px;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s var(--ease-out);
+  background: radial-gradient(
+    circle closest-side,
+    rgba(255, 255, 255, 0.5),
+    rgba(255, 255, 255, 0.16) 45%,
+    rgba(255, 255, 255, 0) 72%
+  );
+  mix-blend-mode: overlay;
+  will-change: transform;
+}
+
+/* --- Click burst ---------------------------------------------------------- */
+
+.fx-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 118;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.fx-burst {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Two-tone outline instead of a blend mode, for the same stacking-context
+   reason as the sheen -- and it reads cleanly on the paper ground AND on the
+   dark footer without any compositing cost. */
+.fx-burst__ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 0 1.5px rgba(20, 20, 20, 0.45);
+  animation: fx-ring 0.62s var(--ease-out) forwards;
+}
+
+.fx-burst__spark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 3px;
+  height: 3px;
+  margin: -1.5px 0 0 -1.5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 0 1px rgba(20, 20, 20, 0.4);
+  transform: rotate(var(--a)) translateX(0);
+  animation: fx-spark var(--t, 0.6s) var(--ease-out) forwards;
+}
+
+@keyframes fx-ring {
+  from {
+    transform: scale(0.2);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(3.6);
+    opacity: 0;
+  }
+}
+
+@keyframes fx-spark {
+  0% {
+    transform: rotate(var(--a)) translateX(4px) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(var(--a)) translateX(var(--d, 34px)) scale(0.2);
+    opacity: 0;
+  }
+}
+
+/* --- Scroll-progress arc on the cursor ------------------------------------
+   Rides the cursor's spring position but never its hover scale, so it stays a
+   constant-size arc while the ring underneath grows and takes a label. */
+.fx-cursor-prog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 119;
+  width: 62px;
+  height: 62px;
+  margin: -31px 0 0 -31px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.45s var(--ease-out);
+}
+
+.fx-cursor-prog.is-on {
+  opacity: 1;
+}
+
+.fx-cursor-prog circle {
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+
+.fx-cursor-prog__arc {
+  stroke: var(--ink);
+}
+
+.fx-cursor-prog__track {
+  stroke: rgba(20, 20, 20, 0.16);
+}
+
+/* The cursor is desktop-only -- its companions must follow it, or they hang
+   in the middle of a phone screen with nothing to attach to. */
+@media (hover: none), (pointer: coarse) {
+  .fx-cursor-prog,
+  .fx-sheen {
+    display: none;
+  }
+}
+
+/* --- Wordmark chromatic split ---------------------------------------------
+   The two giant names react to scroll SPEED: at rest they are solid ink, and
+   the faster the page moves the further their red/cyan ghosts separate. Pure
+   text-shadow, so the glyph boxes never move and the JS width fit that sizes
+   them is untouched. */
+.wordmark {
+  text-shadow: calc(var(--fx-vel, 0) * 9px) 0 rgba(255, 58, 96, 0.5),
+    calc(var(--fx-vel, 0) * -9px) 0 rgba(0, 176, 255, 0.45);
+  transition: text-shadow 0.25s linear;
+}
+
+/* The contact name is a link, so it also answers to the pointer. */
+.contact__wordmark {
+  transition: text-shadow 0.25s linear, transform 0.7s var(--ease-out);
+}
+
+.contact__wordmark:hover {
+  text-shadow: 10px 0 rgba(255, 58, 96, 0.55), -10px 0 rgba(0, 176, 255, 0.5);
+}
+
+/* --- Dot grid parallax ----------------------------------------------------
+   Moves the TEXTURE, not the element: translating the tile would drag its
+   bottom edge up and leave a bare strip at the end of the panel. */
+.dot-tile {
+  background-position: 50% calc(var(--fx-progress, 0) * -260px);
+}
+
+/* --- Phone glare ----------------------------------------------------------
+   A slow diagonal light travelling across the device, brightening with scroll
+   speed. .phone already clips its overflow, so the band stays inside the
+   bezel. */
+.phone::after {
+  content: "";
+  position: absolute;
+  top: -60%;
+  left: -140%;
+  width: 90%;
+  height: 220%;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.1) 45%,
+    rgba(255, 255, 255, 0.22) 50%,
+    rgba(255, 255, 255, 0.1) 55%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: rotate(18deg);
+  opacity: calc(0.35 + var(--fx-vel, 0) * 0.65);
+  animation: fx-glare 7s var(--ease-io) infinite;
+}
+
+@keyframes fx-glare {
+  0%,
+  62% {
+    left: -140%;
+  }
+  100% {
+    left: 190%;
+  }
+}
+
+/* --- Tilt cards (tech grid) ----------------------------------------------- */
+
+.fx-tilt {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* The reveal wrapper carries the fade-up so it doesn't fight the cell's tilt
+   transform. It reproduces the cell's own icon-over-label stack (the cell now
+   has this single child) and keeps a 3D context so the icon can lift on Z. */
+.brands__reveal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  transform-style: preserve-3d;
+}
+
+/* Beats the base `.brands__cell:hover { transform: translateY(-3px) }` on
+   specificity, so the lift is folded into the tilt instead of fighting it. */
+.brands__cell.fx-tilt {
+  position: relative;
+  transform: perspective(760px) rotateX(var(--tx, 0deg)) rotateY(var(--ty, 0deg));
+  transition: transform 0.5s var(--ease-out), border-color 0.4s var(--ease-out);
+}
+
+.brands__cell.fx-tilt:hover {
+  transform: perspective(760px) rotateX(var(--tx, 0deg)) rotateY(var(--ty, 0deg))
+    translateY(-4px) scale(1.035);
+  transition-duration: 0.12s;
+}
+
+/* Glare follows the pointer across the card face. */
+.brands__cell.fx-tilt::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s var(--ease-out);
+  background: radial-gradient(
+    circle 120px at var(--gx, 50%) var(--gy, 50%),
+    rgba(20, 20, 20, 0.07),
+    rgba(20, 20, 20, 0) 70%
+  );
+}
+
+.brands__cell.fx-tilt:hover::after {
+  opacity: 1;
+}
+
+/* The logo lifts off the card face -- the bit of depth that sells the tilt. */
+.brands__cell.fx-tilt .brands__icon {
+  transition: transform 0.5s var(--ease-out);
+}
+
+.brands__cell.fx-tilt:hover .brands__icon {
+  transform: translateZ(26px) scale(1.06);
+}
+
+/* --- Preloader slats ------------------------------------------------------
+   The intro leaves as five columns pulling up in sequence rather than one
+   flat panel. They sit BEHIND the counter and wordmark inside .preloader, so
+   nothing about that composition changes. */
+/* The panel itself must be see-through so the columns ARE the curtain — a
+   solid panel background would stay put and hide them lifting. The slats
+   cover it completely before exit, so nothing shows through early. */
+.preloader {
+  background: transparent;
+}
+
+.fx-slats {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  pointer-events: none;
+}
+
+.fx-slat {
+  background: var(--bg);
+  /* A hair of overlap: sub-pixel column widths otherwise show the page
+     through as thin seams while they travel. */
+  margin-right: -1px;
+  will-change: transform;
+}
+
+/* The intro content has to sit above the slats it is leaving with. */
+.preloader__mark,
+.preloader > div:not(.fx-slats) {
+  position: relative;
+  z-index: 1;
+}
+
+/* --- Link underline sweep -------------------------------------------------
+   Project links and the email: a rule that wipes in from the left on hover
+   and out to the right on leave. */
+.fx-underline {
+  position: relative;
+}
+
+.fx-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform 0.45s var(--ease-out);
+}
+
+.fx-underline:hover::after {
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+/* --- Visually hidden (keeps scrambled text readable to assistive tech) ----- */
+
+.fx-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* --- Reduced motion -------------------------------------------------------
+   base.css already collapses durations globally; this removes the effects
+   that would otherwise still be VISIBLE as a static artefact (a frozen glare
+   band, an offset colour ghost) rather than as motion. */
+@media (prefers-reduced-motion: reduce) {
+  .fx-sheen,
+  .phone::after {
+    display: none;
+  }
+
+  .wordmark,
+  .contact__wordmark:hover {
+    text-shadow: none;
+  }
+
+  .dot-tile {
+    background-position: 50% 0;
+  }
+
+  .brands__cell.fx-tilt,
+  .brands__cell.fx-tilt:hover {
+    transform: none;
+  }
+}

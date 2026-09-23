@@ -1,0 +1,38 @@
+<svg xmlns='http://www.w3.org/2000/svg' width='540' height='1170' viewBox='0 0 540 1170'>
+  <defs>
+    <linearGradient id='g' x1='0' y1='0' x2='0.4' y2='1'>
+      <stop offset='0' stop-color='#7b6cf6'/>
+      <stop offset='0.52' stop-color='#3b2fb5'/>
+      <stop offset='1' stop-color='#151046'/>
+    </linearGradient>
+    <radialGradient id='glow' cx='0.3' cy='0.22' r='0.7'>
+      <stop offset='0' stop-color='#c9c2ff' stop-opacity='0.85'/>
+      <stop offset='1' stop-color='#c9c2ff' stop-opacity='0'/>
+    </radialGradient>
+    <filter id='soft' x='-40%' y='-40%' width='180%' height='180%'>
+      <feGaussianBlur stdDeviation='70'/>
+    </filter>
+    <filter id='grain'>
+      <feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/>
+      <feColorMatrix type='saturate' values='0'/>
+    </filter>
+  </defs>
+
+  <rect width='540' height='1170' fill='url(#g)'/>
+  <rect width='540' height='1170' fill='url(#glow)'/>
+
+  <g filter='url(#soft)' opacity='0.75'>
+    <circle cx='421.2' cy='351' r='226.79999999999998' fill='#7b6cf6' opacity='0.55'/>
+    <circle cx='97.2' cy='725.4' r='270' fill='#151046' opacity='0.7'/>
+    <circle cx='334.8' cy='1006.1999999999999' r='205.2' fill='#3b2fb5' opacity='0.6'/>
+  </g>
+
+  <g stroke='#c9c2ff' stroke-opacity='0.28' fill='none'>
+    <circle cx='270' cy='514.8' r='70'/><circle cx='270' cy='514.8' r='132'/><circle cx='270' cy='514.8' r='194'/><circle cx='270' cy='514.8' r='256'/><circle cx='270' cy='514.8' r='318'/>
+  </g>
+  <g stroke='#c9c2ff' stroke-opacity='0.16' stroke-width='1'>
+    <line x1='0' y1='93.60000000000001' x2='540' y2='93.60000000000001'/><line x1='0' y1='210.60000000000002' x2='540' y2='210.60000000000002'/><line x1='0' y1='327.6' x2='540' y2='327.6'/><line x1='0' y1='444.6' x2='540' y2='444.6'/><line x1='0' y1='561.6' x2='540' y2='561.6'/><line x1='0' y1='678.6' x2='540' y2='678.6'/><line x1='0' y1='795.6' x2='540' y2='795.6'/><line x1='0' y1='912.6' x2='540' y2='912.6'/><line x1='0' y1='1029.6' x2='540' y2='1029.6'/>
+  </g>
+
+  <rect width='540' height='1170' filter='url(#grain)' opacity='0.14'/>
+</svg>

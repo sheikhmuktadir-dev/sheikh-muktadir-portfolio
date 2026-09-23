@@ -1,0 +1,1921 @@
+/* ===========================================================================
+   SECTIONS — hero, statement, work, services, about, contact
+   =========================================================================== */
+
+/* --- Hero stage (banner + sticky phone) ----------------------------------- */
+
+/* Wraps the banner, the statement AND every case study. The phone layer is
+   laid over this whole box, so one phone stays pinned for the entire run:
+   it starts tilted in the banner, unwinds upright as the case studies
+   arrive, and swaps its media per study — never unmounting. */
+.phone-track {
+  position: relative;
+  background-color: var(--bg);
+  /* Dotted ground runs the full length — banner, statement AND case studies —
+     matching the reference, whose tile spans all three (6514px) and rounds
+     off at the bottom against the dark page behind it. */
+  border-radius: 0 0 24px 24px;
+}
+
+.hero {
+  position: relative;
+  /* Taller than the viewport on purpose. overflow:hidden clips the wordmark at
+     this bottom edge, so the edge has to sit BELOW the fold — otherwise the
+     letters get sliced off in view. The reference does the same: a 1280px hero
+     against a 1080 viewport, clipping 200px off-screen. */
+  min-height: calc(100svh + clamp(120px, 18vh, 220px));
+  display: flex;
+  flex-direction: column;
+  padding: 2rem var(--gutter) 0;
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  /* clip (not hidden) + a generous clip-margin lets the wordmark's bottom paint
+     fully past the edge, so the letters are NEVER cut — without moving them. */
+  overflow: clip;
+  overflow-clip-margin: 120px;
+}
+
+.hero__top {
+  position: relative;
+  z-index: 3;
+  /* Reference headline box is 784 of a 1596 inner container. No ch cap:
+     it wins over the percentage at wide viewports and narrows the column. */
+  max-width: 49%;
+}
+
+.hero__headline {
+  font-family: var(--font-grotesk);
+  font-weight: var(--wght-display);
+  font-size: clamp(2rem, 3.75vw, 4.6rem);
+  letter-spacing: -0.04em;
+  line-height: 0.98;
+}
+
+.hero__line {
+  display: block;
+  overflow: hidden;
+}
+
+/* Matches td-noise's hero intro: Schibsted Grotesk 24px, grey #737373,
+   line-height 1.2. Mine ran ~16px, which read small next to the headline. */
+.hero__intro {
+  margin-top: 1.5rem;
+  max-width: 30ch;
+  font-family: var(--font-grotesk);
+  color: rgb(115, 115, 115);
+  font-size: clamp(1.2rem, 1.9vw, 1.5rem);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+/* Oversized word — bleeds off both sides, clipped by the hero's bottom edge,
+   and sits behind the phone. */
+.hero__wordmark {
+  position: absolute;
+  left: 50%;
+  /* Exact position kept (20px lower). Clipping is fixed via the hero's
+     overflow-clip-margin, NOT by moving this. */
+  bottom: -20px;
+  translate: -50% 0;
+  z-index: 1;
+  font-size: clamp(7rem, 33vw, 34rem);
+  pointer-events: none;
+}
+
+/* Inline banner image — desktop uses the sticky phone instead, so hide it. */
+.hero__figure {
+  display: none;
+}
+
+@media (max-width: 767.98px) {
+  /* No extra tail height on phones — the wordmark then bleeds at the real fold
+     and overlaps the image bottom, like td-noise. Extra top padding so the
+     headline clears the absolute nav (brand + MENU) instead of touching it. */
+  .hero {
+    min-height: 100svh;
+    padding-top: clamp(5rem, 15vw, 6.5rem);
+  }
+  .hero__top {
+    max-width: 100%;
+  }
+  .hero__intro {
+    max-width: 40ch;
+  }
+  /* The shared sticky phone is removed on phones — the banner image is a plain
+     inline figure below the text instead (scrolls with the page, not sticky). */
+  .phone-layer {
+    display: none;
+  }
+  /* Full-bleed portrait image, edge to edge, sitting below the text in normal
+     flow — like td-noise's mobile banner. */
+  .hero__figure {
+    position: relative;
+    display: block;
+    width: 100vw;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    margin-top: clamp(1.5rem, 6vw, 3rem);
+    aspect-ratio: 3 / 4;
+    max-height: 78vh;
+    overflow: hidden;
+    background: #1b1b1d;
+  }
+  .hero__figure img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  /* Wordmark sits below the image on the light ground, so keep it dark (the
+     base ink colour) — a light wordmark here was unreadable on the pale photo. */
+  .hero__wordmark {
+    color: var(--ink);
+  }
+}
+
+/* Tablet (768–1023): the nav now collapses to brand + MENU (like td-noise), so
+   the headline can no longer share the top row with inline links — it needs
+   clearance below the absolute nav, and it can widen to fill more of the row
+   (the phone sits lower and centred, so a wider headline up top doesn't clash). */
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .hero {
+    padding-top: clamp(4.5rem, 9vw, 6rem);
+  }
+  .hero__top {
+    max-width: 70%;
+  }
+  .hero__intro {
+    max-width: 34ch;
+  }
+}
+
+/* --- Sticky phone rail ---------------------------------------------------- */
+
+.phone-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Pins for the full height of .phone-track. */
+.phone-sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  display: flex;
+  /* Anchored from the top: the reference banner puts the phone at ~17vh,
+     not vertically centred. */
+  align-items: flex-start;
+  padding-top: clamp(4rem, 17vh, 12rem);
+  justify-content: center;
+}
+
+/* The phone's own box. Sized here so the tags can be positioned against it. */
+/* Tilt is applied here by <PhoneTrack /> as a motion value: 5deg in the
+   banner, unwinding to 0 as the case studies arrive. Do not set rotate in
+   CSS — the inline motion style would win and the animation would look
+   like it simply snapped. */
+.phone-stage {
+  position: relative;
+  transform-origin: 50% 50%;
+  /* Deliberately NOT preserve-3d. It sorts children by 3D depth and ignores
+     z-index, which paints the rotated phone over the pills. The 3D belongs to
+     .phone-3d; the stage stays flat so normal stacking applies. */
+  will-change: transform;
+  /* Reference Video Container is a FIXED 724px tall at every viewport height
+     (measured identical at both 1080 and 900) — it does NOT scale with svh.
+     Using svh made it shrink on shorter screens and read too small. min() only
+     caps it on very short viewports so it never exceeds the screen. */
+  flex: none;
+  /* 724px on tall monitors (td-noise size); on shorter windows it caps to 80vh
+     so the whole phone — rounded bottom included — stays on screen. Big, but
+     never cut. */
+  height: min(724px, 80vh);
+  width: auto;
+  aspect-ratio: 0.473011;
+}
+
+.phone {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: clamp(26px, 2.3vw, 40px);
+  background: linear-gradient(165deg, #2e2e30, #121213);
+  border: 7px solid #1b1b1d;
+  box-shadow: 0 40px 90px rgba(20, 20, 20, 0.3);
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+
+.phone img,
+.phone video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.phone__empty {
+  font-family: var(--font-ui);
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: rgba(245, 245, 245, 0.4);
+  text-align: center;
+  padding: 1rem;
+  line-height: 1.8;
+}
+
+/* Notch */
+.phone__notch {
+  position: absolute;
+  top: 2.5%;
+  left: 50%;
+  translate: -50% 0;
+  width: 34%;
+  height: 3.2%;
+  border-radius: 999px;
+  background: #0d0d0e;
+  z-index: 2;
+}
+
+/* Wrapper so the pills own the nth-child sequence (the phone is a sibling
+   div, so nth-of-type would count it and shift every pill by one). */
+.phone-tags {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* Carries the 3D pass alone. The stage keeps only the vertical drift, so the
+   pills and stat cards sitting on it stay flat instead of being foreshortened
+   with the device. */
+.phone-3d {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+
+/* Capability pills clustered around the phone's lower half */
+.phone-tag {
+  position: absolute;
+  z-index: 3;
+}
+
+/* Measured off the reference at 1905x1080: all four left-anchored, on a
+   strict 51px vertical rhythm (711 / 762 / 813 / 864). */
+/* Percentages are of the PHONE box now, not the viewport.
+   Horizontal, derived from the reference (phone 781-1123 at 1905):
+     1 & 3 end at/near the left edge -> anchored from their right
+     2 & 4 begin inside and run past -> anchored from their left
+   Vertical: the four sit as a group centred on the phone. Spacing is 7%
+   (51px of a 730px phone); the block is centred at 50%. */
+/* Overlapping the device, as in the reference — pills sitting clear of it
+   read as detached labels rather than part of the composition. */
+/* Exact positions measured off td-noise's live banner (phone box left 547,
+   width 323; pills measured in the same frame). Expressed as % of the phone:
+     1 Creative      LEFT  — right edge 12.1% from phone-left  -> right 87.9%
+     3 Content       LEFT  — right edge 23.5% from phone-left  -> right 76.5%
+     2 Strategy      RIGHT — left edge  74.0% from phone-left  -> left  74%
+     4 Distribution  RIGHT — left edge  67.5% from phone-left  -> left  67.5%
+   Vertical: even 51px reference rhythm over the phone's 724px height, the
+   group centred on the phone -> top edges 41.5 / 48.5 / 55.5 / 62.5%. */
+.phone-tag:nth-child(1) {
+  right: 87.9%;
+  left: auto;
+  top: 41.5%;
+}
+.phone-tag:nth-child(2) {
+  left: 74%;
+  right: auto;
+  top: 48.5%;
+}
+.phone-tag:nth-child(3) {
+  right: 76.5%;
+  left: auto;
+  top: 55.5%;
+}
+.phone-tag:nth-child(4) {
+  left: 67.5%;
+  right: auto;
+  top: 62.5%;
+}
+
+@media (max-width: 900px) {
+  .phone-tag .tag {
+    font-size: 0.6rem;
+    padding: 0.35rem 0.55rem;
+  }
+  .phone-tag:nth-child(1) {
+    right: 92%;
+    left: auto;
+    top: 34.8%;
+  }
+  .phone-tag:nth-child(2) {
+    left: 78%;
+    right: auto;
+    top: 41.8%;
+  }
+  .phone-tag:nth-child(3) {
+    right: 82%;
+    left: auto;
+    top: 48.8%;
+  }
+  .phone-tag:nth-child(4) {
+    left: 56%;
+    right: auto;
+    top: 55.8%;
+  }
+}
+
+@media (max-width: 600px) {
+  .phone-tag:nth-child(2),
+  .phone-tag:nth-child(4) {
+    display: none;
+  }
+  .phone-tag:nth-child(1) {
+    right: 78%;
+    left: auto;
+    top: 38%;
+  }
+  .phone-tag:nth-child(3) {
+    right: 70%;
+    left: auto;
+    top: 54%;
+  }
+}
+
+/* --- Statement ------------------------------------------------------------ */
+
+/* The hero already carries its own extra height (it runs past the fold so
+   the wordmark clip lands off-screen), so the section rhythm on top of that
+   opens a huge hole. Reference gap from wordmark to statement is 20px. */
+.statement {
+  position: relative;
+  /* Clearance for the banner wordmark's full (now un-clipped) bottom so the
+     letters never collide with the statement text — while keeping the SAME
+     visible gap between the word and the text (the word now reaches lower, so
+     the text sits lower to match). Scales with the wordmark size. */
+  padding-top: clamp(82px, 7vw, 104px);
+}
+
+/* Same spec as the banner headline: 72px / wght 666 / lh 0.98 / ls -0.04em
+   at 1920, centred across the full container width — not a narrow column. */
+.statement__text {
+  font-family: var(--font-grotesk);
+  font-weight: var(--wght-display);
+  font-size: clamp(2rem, 3.75vw, 4.6rem);
+  letter-spacing: -0.04em;
+  line-height: 0.98;
+  text-align: center;
+  max-width: none;
+  /* Even the lines out so the last one is never a lonely short orphan —
+     the browser redistributes words across lines for a balanced block
+     rather than filling each line greedily and stranding a few words. */
+  text-wrap: balance;
+}
+
+/* CTA pair sits 24px under the text, centred. */
+.statement__cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  margin-top: 24px;
+}
+
+@media (max-width: 860px) {
+  .statement__text {
+    text-align: center;
+  }
+}
+
+/* --- Case studies (sticky phone + scrolling blocks) ----------------------- */
+
+.cs {
+  position: relative;
+}
+
+.phone__media {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.phone__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Floating stat pills around the phone */
+.cs__stat {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.6rem 0.95rem;
+  background: var(--bg-2);
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(20, 20, 20, 0.13);
+  white-space: nowrap;
+}
+
+.cs__stat-value {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(1.15rem, 1.9vw, 1.6rem);
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.cs__stat-label {
+  font-family: var(--font-ui);
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+/* Wrapper so the whole set can crossfade together. */
+.cs__stats {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Positions echo the reference: stepped, alternating sides of the phone. */
+/* Percentages are of the PHONE box (same wrapper as the banner pills). */
+.cs__stat:nth-child(1) {
+  left: 86%;
+  right: auto;
+  top: 20%;
+}
+.cs__stat:nth-child(2) {
+  right: 90%;
+  left: auto;
+  top: 42%;
+}
+.cs__stat:nth-child(3) {
+  left: 82%;
+  right: auto;
+  top: 60%;
+}
+.cs__stat:nth-child(4) {
+  right: 84%;
+  left: auto;
+  top: 82%;
+}
+
+/* --- Blocks --------------------------------------------------------------- */
+
+/* Breathing room before the first case study: a stretch of scroll with
+   nothing but the phone, straight and alone, before the studies start
+   arriving. Sized past a full viewport so the phone locks centred and holds
+   there for a beat of empty scroll — the first PROJECT block only rises in
+   after that, rather than trailing the phone's bottom edge as it settles. */
+.cs__blocks {
+  position: relative;
+  z-index: 1;
+  padding-top: clamp(620px, 125vh, 1500px);
+  /* Tail room so the sticky phone stays pinned through the LAST case study.
+     A sticky element releases once its containing block runs out, so without
+     this the phone scrolls away while the final study is still on screen. */
+  padding-bottom: clamp(300px, 55vh, 700px);
+}
+
+.cs__block {
+  position: relative;
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr) minmax(0, 1fr);
+  grid-template-rows: auto 1fr auto;
+  gap: 1.5rem;
+  padding: clamp(2rem, 5vh, 4rem) var(--gutter);
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  align-content: space-between;
+}
+
+/* CASE STUDY ————————————————— 01 */
+.cs__rule-row {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.cs__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--font-ui);
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink);
+  flex: none;
+}
+
+.cs__square {
+  width: 9px;
+  height: 9px;
+  background: var(--ink);
+  flex: none;
+}
+
+.cs__rule {
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+.cs__index {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(1.6rem, 3vw, 2.6rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  flex: none;
+}
+
+/* Left copy column — clears the centred phone. */
+.cs__copy {
+  grid-column: 1;
+  grid-row: 2;
+  align-self: center;
+  max-width: 34ch;
+}
+
+.cs__year {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.13em;
+  color: var(--ink-soft);
+  margin-bottom: 0.6rem;
+}
+
+.cs__title {
+  font-family: var(--font-grotesk);
+  font-weight: var(--wght-display);
+  font-size: clamp(2rem, 3.75vw, 4rem);
+  letter-spacing: -0.04em;
+  line-height: 0.98;
+  margin-bottom: clamp(1.5rem, 4vh, 3rem);
+}
+
+.cs__desc {
+  color: var(--ink-soft);
+  font-size: var(--step-1);
+  line-height: 1.4;
+  letter-spacing: -0.015em;
+}
+
+.cs__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-top: clamp(1.25rem, 3vh, 2rem);
+  font-family: var(--font-ui);
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.cs__link svg {
+  transition: transform 0.45s var(--ease-out);
+}
+.cs__link:hover svg {
+  transform: translateX(6px);
+}
+
+/* Categories, bottom right */
+.cs__cats {
+  grid-column: 3;
+  grid-row: 3;
+  justify-self: end;
+  align-self: end;
+  text-align: right;
+}
+
+.cs__cats-label {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 0.6rem;
+}
+
+.cs__cats-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.cs__cat {
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-family: var(--font-ui);
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+/* Below desktop width the floating stat cards crowd the phone — hide them, but
+   keep the 3-column text layout so the phone still floats over the empty middle
+   column instead of over the text. */
+@media (max-width: 1000px) {
+  .cs__stat {
+    display: none;
+  }
+}
+
+/* Inline project cover — desktop hides it (the sticky phone shows the media);
+   mobile shows it stacked in each block. */
+.cs__cover {
+  display: none;
+}
+
+/* Tablet / small laptop (768–1024): keep the desktop sticky-phone overlay — the
+   image stays pinned and swaps per project — but shrink the phone so it sits in
+   the empty middle column and never covers the text (copy is column 1,
+   categories column 3). */
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  /* Keep the sticky phone at tablet (client choice), but sized so the side
+     columns aren't starved: a 0.85fr copy column was ~180px, which wrapped the
+     description every 3-4 words. Shrink the phone and even out the tracks so the
+     copy and categories each get real width and read cleanly. */
+  .phone-sticky .phone-stage {
+    height: min(500px, 54vh);
+  }
+  .cs__block {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr) minmax(0, 1fr);
+    gap: 1rem;
+  }
+  .cs__copy {
+    max-width: none;
+  }
+  .cs__title {
+    /* Hold a slightly smaller ceiling so a two/three-word title doesn't blow the
+       narrower column open. */
+    font-size: clamp(1.75rem, 4.5vw, 2.4rem);
+  }
+  /* Trim the desktop's big empty scroll gaps so the section isn't oversized on
+     a tablet, while each project/step still gets enough height for the sticky
+     phone and rolling numeral. */
+  .cs__blocks {
+    padding-top: clamp(140px, 32vh, 360px);
+    /* Tail keeps the sticky phone pinned & centred THROUGH the last project: the
+       phone unpins over the final ~1 viewport of this track, so the last block
+       must still have room below it when it crosses the viewport middle (which
+       is what switches the phone to project 03 and holds it there). Trimmed from
+       the desktop tail but NOT starved — cutting it too far unpins the phone
+       before it reaches project 03. */
+    padding-bottom: clamp(90px, 18vh, 200px);
+  }
+  .cs__block {
+    min-height: 78svh;
+  }
+  /* Extra specificity so it beats the base .proc__step { min-height: 100svh }
+     which appears later in the file. */
+  .proc__steps .proc__step {
+    min-height: 72svh;
+  }
+  .proc__steps {
+    padding-bottom: 0;
+  }
+}
+
+/* Phones: single column. The image is STICKY — it pins at the top while the
+   text scrolls up OVER it on a solid background, so the image stays put (the
+   sticky style) and the text is always fully readable, never cut. */
+/* Phones: simple single-column stack — image, then text, scrolling normally. */
+@media (max-width: 767.98px) {
+  .cs__blocks {
+    padding-top: clamp(2rem, 8vw, 4rem);
+    padding-bottom: clamp(2rem, 8vw, 4rem);
+  }
+  .cs__block {
+    min-height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.1rem;
+  }
+  /* Outer frame is full width and does NOT clip, so the cards can overhang the
+     slim image edges like td-noise. */
+  .cs__cover {
+    display: block;
+    position: relative;
+    width: 100%;
+  }
+  /* Slim portrait image, centred with side gutters (phone-screen proportion). */
+  .cs__cover-media {
+    width: 68%;
+    margin-inline: auto;
+    aspect-ratio: 9 / 16;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #1b1b1d;
+  }
+  .cs__cover-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Floating stat cards over the mobile cover image (td-noise style). The
+     overlay spans the full frame, so cards sit in the gutters and straddle the
+     slim image's edges. */
+  .cs__cover-stats {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .cs__cover-stat {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.5rem 0.7rem;
+    background: var(--bg-2);
+    border-radius: 10px;
+    box-shadow: 0 12px 28px rgba(20, 20, 20, 0.22);
+    white-space: nowrap;
+    animation: cs-cover-float 6s ease-in-out infinite;
+  }
+  .cs__cover-stat-value {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: 1.05rem;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .cs__cover-stat-label {
+    font-family: var(--font-ui);
+    font-size: 0.6rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+  /* Alternating sides, stepped down, overhanging the slim image's edges —
+     mirrors the reference layout. */
+  .cs__cover-stat:nth-child(1) {
+    top: 14%;
+    right: 6%;
+    animation-delay: 0s;
+  }
+  .cs__cover-stat:nth-child(2) {
+    top: 40%;
+    left: 6%;
+    animation-delay: -1.5s;
+  }
+  .cs__cover-stat:nth-child(3) {
+    top: 60%;
+    right: 4%;
+    animation-delay: -3s;
+  }
+  .cs__cover-stat:nth-child(4) {
+    bottom: 12%;
+    left: 6%;
+    animation-delay: -4.5s;
+  }
+  @keyframes cs-cover-float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-6px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cs__cover-stat {
+      animation: none;
+    }
+  }
+  .cs__copy,
+  .cs__cats {
+    align-self: start;
+    text-align: left;
+    max-width: 100%;
+  }
+  .cs__cats-list {
+    justify-content: flex-start;
+  }
+}
+
+/* --- Services ------------------------------------------------------------- */
+
+/* Surface system, matching the reference: a dark page (body) with light
+   surfaces stacked on it, each rounding 24px where it meets the dark. The
+   small margins are what let those corners actually read — without a gap the
+   radius has nothing to reveal behind it. */
+#brands,
+#about,
+#testimonials {
+  background: var(--bg);
+}
+
+/* The quote mark reaches to the container edge; on narrower laptops it can nudge
+   a hair past the viewport. Clip horizontally (x only, so the mark's vertical
+   overhang is preserved) to prevent a horizontal scrollbar. */
+#testimonials {
+  overflow-x: clip;
+}
+
+#brands {
+  margin-top: 24px;
+  border-radius: 24px 24px 0 0;
+}
+
+/* Testimonials is the bottom of the light surface block (brands → about →
+   testimonials), so the rounded bottom + margin live here, not on #about. */
+#testimonials {
+  margin-bottom: 24px;
+  border-radius: 0 0 24px 24px;
+}
+
+/* Tablet/desktop: About ends with a big block of scroll room for the rolling
+   numeral (each step is a full viewport), so the normal seam padding on top of
+   that read as a huge empty band before Testimonials. Pull Testimonials up over
+   the seam and trim its own top padding — About itself is left untouched. On
+   phones the steps are content-height (no trailing room), so this isn't needed. */
+@media (min-width: 768px) {
+  #testimonials {
+    margin-top: calc(-1 * var(--section-y));
+    padding-top: clamp(0.5rem, 1vw, 1rem);
+  }
+}
+
+/* Every section (brands, about, testimonials, contact) keeps the uniform
+   --section-y padding-block from .section, so all gaps match — no special
+   seams. The light surface just reads as one continuous panel. */
+
+/* --- Testimonials --------------------------------------------------------- */
+
+.testi__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--ink);
+}
+.testi__square {
+  width: 9px;
+  height: 9px;
+  background: var(--ink);
+  flex: none;
+}
+
+.testi__grid {
+  display: grid;
+  /* Positioned so the desktop quote mark (a direct child) can anchor its right
+     edge to the grid's right edge — which equals the .shell content edge. */
+  position: relative;
+  /* Left content, a fixed slim portrait (~332px, like td-noise), then a right
+     spacer track so the image sits center-right — not jammed against the edge. */
+  grid-template-columns: minmax(0, 1fr) clamp(260px, 40vw, 332px) minmax(0, 0.1fr);
+  gap: clamp(2.5rem, 4vw, 3rem);
+  align-items: center;
+  /* Bigger space under the label before the quote, matching td-noise (~160px). */
+  margin-top: clamp(3.25rem, 7vw, 7rem);
+}
+
+/* Left column — the star rail sits well left of the quote (big gap, like the
+   reference) and is vertically centred on the block. */
+.testi__main {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  /* Column gap = the big star→quote indent; row gap kept tight so the arrows
+     sit close under the content. */
+  column-gap: clamp(3rem, 11vw, 13rem);
+  row-gap: 0;
+  align-items: center;
+}
+
+/* Vertical star rail */
+.testi__stars {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.testi__star {
+  width: 13px;
+  height: 13px;
+  fill: var(--line);
+}
+.testi__star.is-on {
+  fill: var(--ink);
+}
+
+.testi__quote {
+  font-family: var(--font-grotesk);
+  font-weight: var(--wght-display);
+  /* Matches td-noise: holds ~32px through tablet/small-laptop, then ramps to
+     48px by ~1920 (it was ramping up too early before). */
+  font-size: clamp(2rem, 2.5vw, 3rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  margin: 0;
+  /* ~44% of the container, capped ~710px — wraps to ~5-6 lines like the ref. */
+  max-width: clamp(20rem, 42vw, 44.5rem);
+}
+
+.testi__author {
+  /* Same gap as quote→name and name→arrows (consistent rhythm). */
+  margin-top: clamp(2.25rem, 3.6vw, 3rem);
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.testi__name {
+  font-family: var(--font-ui);
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.testi__role {
+  font-family: var(--font-ui);
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.testi__nav {
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  /* Same gap as quote→name — even rhythm between quote, name and arrows. */
+  margin-top: clamp(2.25rem, 3.6vw, 3rem);
+}
+.testi__arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--dark);
+  color: var(--dark-fg);
+  border: 0;
+  cursor: pointer;
+  transition:
+    transform 0.35s var(--ease-out),
+    background 0.35s var(--ease-out);
+}
+.testi__arrow:hover {
+  transform: translateY(-3px);
+  background: #000;
+}
+.testi__arrow:active {
+  transform: translateY(0) scale(0.96);
+}
+.testi__count {
+  margin-left: 1rem;
+  font-family: var(--font-ui);
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.11em;
+  color: var(--ink-soft);
+}
+
+/* Right column — portrait with floating stat cards */
+.testi__aside {
+  position: relative;
+}
+/* Big faint geometric quote mark, up and to the right of the portrait (exact
+   td-noise shape). Shared paint styling; each variant sets its own box. */
+.testi__quotemark {
+  position: absolute;
+  height: auto;
+  z-index: 0;
+  fill: rgb(204, 204, 204);
+  opacity: 0.4;
+  pointer-events: none;
+}
+/* Desktop — anchored to the grid, right edge flush with the container content
+   edge (grid right == .shell content edge), so it reaches the edge like
+   td-noise at every width but never spills past it. Width tracks the portrait
+   (76% of the clamp(260,40vw,332) image); top:-17% of the grid sits it over the
+   image's top-right corner (the image is the tallest cell, so grid top == image
+   top on desktop). */
+.testi__quotemark--edge {
+  top: -17%;
+  right: 0;
+  width: clamp(198px, 30.4vw, 252px);
+}
+/* The phone copy is hidden until the layout stacks. */
+.testi__quotemark--stack {
+  display: none;
+}
+.testi__media {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  /* Slim portrait (~0.53) like the reference, not a tall 4/5 block. */
+  aspect-ratio: 8 / 15;
+  border-radius: 18px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+.testi__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.testi__initials {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(3rem, 7vw, 6rem);
+  letter-spacing: -0.02em;
+  color: rgba(245, 245, 245, 0.9);
+}
+
+.testi__stats {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+.testi__stat {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.7rem 1rem;
+  background: var(--bg-2);
+  border-radius: 12px;
+  box-shadow: 0 14px 34px rgba(20, 20, 20, 0.18);
+  white-space: nowrap;
+  animation: testi-float 6s ease-in-out infinite;
+}
+.testi__stat-value {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(1.2rem, 1.8vw, 1.6rem);
+  line-height: 1;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.testi__stat-label {
+  font-family: var(--font-ui);
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+/* Top-left and bottom-right, overhanging the portrait edges (reference). */
+.testi__stat:nth-child(1) {
+  top: 12%;
+  left: -7%;
+  animation-delay: 0s;
+}
+.testi__stat:nth-child(2) {
+  bottom: 12%;
+  right: -7%;
+  animation-delay: -3s;
+}
+@keyframes testi-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .testi__stat {
+    animation: none;
+  }
+}
+
+/* Tablet: keep two columns but relax the gap. */
+@media (max-width: 1023.98px) {
+  .testi__grid {
+    gap: clamp(1.5rem, 4vw, 3rem);
+  }
+  .testi__stat:nth-child(1) {
+    left: -3%;
+  }
+  .testi__stat:nth-child(2) {
+    right: -3%;
+  }
+}
+
+/* Phones: stack — quote block first, portrait below. */
+@media (max-width: 767.98px) {
+  .testi__grid {
+    grid-template-columns: 1fr;
+    gap: 2.25rem;
+  }
+  .testi__main {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .testi__quote {
+    max-width: 100%;
+    /* Smaller on phones — the desktop 32px min is too big in a narrow column. */
+    font-size: clamp(1.5rem, 6vw, 2rem);
+  }
+  .testi__aside {
+    order: 2;
+  }
+  .testi__media {
+    aspect-ratio: 3 / 4;
+    width: 82%;
+    margin-inline: auto;
+  }
+  /* On phones the portrait stacks, so swap to the aside-scoped copy that tracks
+     it (the grid-anchored desktop copy would land over the quote text). */
+  .testi__quotemark--edge {
+    display: none;
+  }
+  .testi__quotemark--stack {
+    display: block;
+    width: 46%;
+    top: -8%;
+    right: 2%;
+  }
+  .testi__stat {
+    padding: 0.55rem 0.75rem;
+  }
+  .testi__stat:nth-child(1) {
+    top: 10%;
+    left: 2%;
+  }
+  .testi__stat:nth-child(2) {
+    bottom: 10%;
+    right: 2%;
+  }
+}
+
+.services__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-top: clamp(1.75rem, 4vw, 3rem);
+}
+
+.services__card {
+  position: relative;
+  background: var(--bg);
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  min-height: clamp(210px, 24vw, 300px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 2rem;
+  overflow: hidden;
+  transition: background 0.5s var(--ease-out);
+}
+
+.services__card:hover {
+  background: var(--bg-2);
+}
+
+.services__card::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 100%;
+  background: var(--ink);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.6s var(--ease-io);
+}
+
+.services__card:hover::after {
+  transform: scaleX(1);
+}
+
+.services__num {
+  font-family: var(--font-ui);
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.13em;
+  color: var(--ink-mute);
+}
+
+.services__card-title {
+  font-family: var(--font-grotesk);
+  font-size: var(--step-2);
+  font-weight: var(--wght-display);
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  margin-bottom: 0.6rem;
+}
+
+.services__card-body {
+  color: var(--ink-soft);
+  max-width: 38ch;
+}
+
+/* --- About ---------------------------------------------------------------- */
+
+.about__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+  gap: clamp(2rem, 6vw, 5.5rem);
+  align-items: start;
+}
+
+.about__sticky {
+  position: sticky;
+  top: clamp(5rem, 12vh, 7rem);
+}
+
+.about__heading {
+  font-family: var(--font-grotesk);
+  font-size: var(--step-3);
+  font-weight: var(--wght-display);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin-top: 0.9rem;
+}
+
+.about__body p {
+  font-family: var(--font-grotesk);
+  font-size: var(--step-2);
+  line-height: 1.24;
+  letter-spacing: -0.035em;
+  font-weight: 400;
+}
+
+.about__body p + p {
+  margin-top: 1.4em;
+}
+.about__body p:last-child {
+  color: var(--ink-soft);
+}
+
+.about__facts {
+  margin-top: clamp(2.25rem, 5vw, 3.75rem);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+  gap: 1.4rem 2rem;
+  padding-top: 1.75rem;
+  border-top: 1px solid var(--line);
+}
+
+.about__fact-label {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: var(--step--1);
+  font-weight: 500;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin-bottom: 0.35rem;
+}
+
+.about__fact-value {
+  font-size: var(--step-1);
+  letter-spacing: -0.03em;
+}
+
+@media (max-width: 860px) {
+  .about__layout {
+    grid-template-columns: 1fr;
+  }
+  .about__sticky {
+    position: static;
+  }
+}
+
+/* --- Contact -------------------------------------------------------------- */
+
+.contact {
+  position: relative;
+  background: var(--dark);
+  color: var(--dark-fg);
+  /* Uniform rhythm on top; the bottom is tight because the footer continues the
+     same dark surface right below — a full section gap there just read as a huge
+     empty band under the wordmark. */
+  padding-top: clamp(2rem, 4vw, 3.25rem);
+  padding-bottom: clamp(0.5rem, 1.5vw, 1.25rem);
+  text-align: center;
+  overflow: hidden;
+}
+
+.contact .label {
+  color: rgba(245, 245, 245, 0.55);
+}
+
+.contact__lead {
+  font-family: var(--font-grotesk);
+  font-size: var(--step-3);
+  font-weight: var(--wght-display);
+  letter-spacing: -0.04em;
+  line-height: 1.04;
+  margin-top: 1.1rem;
+  max-width: 18ch;
+  margin-inline: auto;
+}
+
+.contact__mail {
+  position: relative;
+  display: inline-block;
+  margin-top: clamp(0.75rem, 1.5vw, 1.25rem);
+  font-family: var(--font-grotesk);
+  font-size: var(--step-2);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  word-break: break-word;
+}
+
+.contact__mail::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform 0.6s var(--ease-io);
+}
+
+.contact__mail:hover::after {
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+/* Oversized name filling the contact width, light on the dark surface — the
+   large-text finale in place of the old buttons. Width is set edge-to-edge by
+   JS (see Contact.jsx). */
+/* Block wrapper owns the top gap and centres the inline name; line-height 1
+   keeps the name in its own row so it can't reach up into the email. */
+.contact__wordmark-wrap {
+  /* Enough top room that the oversized caps (which bleed ~34px above their tight
+     0.72em box on wide screens) clear the email without a huge float above it. */
+  margin-top: clamp(1.5rem, 3.2vw, 3.75rem);
+  /* Break out of the shell gutter so the name spans the FULL section width and
+     centres on the section — edge-to-edge like the banner, not inset by the
+     gutter (which shifted it off-centre). The JS fit already sizes to the whole
+     section width. */
+  margin-inline: calc(-1 * var(--gutter));
+  text-align: center;
+  line-height: 1;
+}
+
+.contact__wordmark {
+  /* inline-block so its box follows the tight line-height (0.72em) instead of
+     the font's full ascent metrics — an inline element reserved ~230px of empty
+     font-metric space above the caps, which read as huge top padding. The JS fit
+     still measures the real glyph width (shrink-to-fit). The caps already
+     overflow this box slightly, so they sit right under the email with no gap. */
+  display: inline-block;
+  color: var(--dark-fg);
+}
+
+/* Mobile: tighten the wordmark's own margin (section padding is the uniform
+   --section-y, same as everywhere). */
+@media (max-width: 767.98px) {
+  .contact__wordmark-wrap {
+    margin-top: clamp(1.25rem, 5vw, 1.75rem);
+  }
+}
+
+.contact__actions {
+  margin-top: clamp(2rem, 5vw, 3rem);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.contact .btn {
+  background: var(--dark-fg);
+  color: var(--dark);
+  border-color: var(--dark-fg);
+}
+
+.contact .btn::before {
+  background: transparent;
+}
+.contact .btn:hover {
+  color: var(--dark);
+}
+
+.contact .btn--ghost {
+  background: transparent;
+  color: var(--dark-fg);
+  border-color: rgba(245, 245, 245, 0.3);
+}
+
+.contact .btn--ghost::before {
+  background: var(--dark-fg);
+}
+.contact .btn--ghost:hover {
+  color: var(--dark);
+  border-color: var(--dark-fg);
+}
+
+/* --- Brands (logo wall) ---------------------------------------------------- */
+
+.brands__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--ink);
+}
+
+.brands__square {
+  width: 9px;
+  height: 9px;
+  background: var(--ink);
+  flex: none;
+}
+
+/* 12 techs → a clean 6 x 2 grid. Soft-grey rounded cards with a bit of gutter,
+   matching the td-noise logo grid. */
+/* Reference (td-noise): 6 columns, a tight 4px gap between cards. */
+.brands__grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 4px;
+  margin-top: clamp(1.25rem, 2.5vw, 2rem);
+}
+
+/* td-noise logo card: no fill (same grey as the section), defined by a thin
+   subtle border only, gently rounded, no shadow. */
+.brands__cell {
+  display: grid;
+  place-items: center;
+  height: 160px;
+  padding: 1rem;
+  border: 1px solid rgba(20, 20, 20, 0.1);
+  border-radius: 8px;
+  background: transparent;
+  transition:
+    border-color 0.4s var(--ease-out),
+    transform 0.4s var(--ease-out);
+}
+
+.brands__cell:hover {
+  border-color: rgba(20, 20, 20, 0.22);
+  transform: translateY(-3px);
+}
+
+/* Placeholder wordmark. Replace with an <img> once you have real marks. */
+.brands__mark {
+  font-family: var(--font-grotesk);
+  font-weight: var(--wght-display);
+  font-size: clamp(1rem, 1.5vw, 1.5rem);
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  text-align: center;
+  line-height: 1.1;
+}
+
+@media (max-width: 1100px) {
+  .brands__grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* Mobile marquee — hidden on desktop/tablet (the grid shows there instead). */
+.brands__marquee {
+  display: none;
+}
+
+@media (max-width: 767.98px) {
+  /* Swap the static grid for two opposing marquee rows. */
+  .brands__grid {
+    display: none;
+  }
+  .brands__marquee {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: clamp(1.25rem, 2.5vw, 2rem);
+    /* Fade both edges so tiles slide in/out softly. */
+    mask-image: linear-gradient(
+      90deg,
+      transparent,
+      #000 8%,
+      #000 92%,
+      transparent
+    );
+  }
+  .brands__row {
+    overflow: hidden;
+  }
+  .brands__track {
+    display: flex;
+    gap: 10px;
+    width: max-content;
+    will-change: transform;
+  }
+  /* Row 1 drifts left → right, row 2 right → left. Both loop seamlessly
+     because each row's tiles are rendered twice and the track slides exactly
+     one copy-width (50%). */
+  .brands__row--ltr .brands__track {
+    animation: brands-ltr 26s linear infinite;
+  }
+  .brands__row--rtl .brands__track {
+    animation: brands-rtl 26s linear infinite;
+  }
+  .brands__marquee .brands__cell {
+    flex: none;
+    width: 128px;
+    height: 118px;
+  }
+}
+
+@keyframes brands-ltr {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes brands-rtl {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .brands__row--ltr .brands__track,
+  .brands__row--rtl .brands__track {
+    animation: none;
+  }
+}
+
+/* --- Process (pinned rolling numeral) -------------------------------------- */
+
+/* Head: rotated label at the far edge, heading offset toward the middle.
+   Reference has the heading starting 533px into a 1596 container (~33%). */
+.proc__head {
+  display: grid;
+  grid-template-columns: minmax(0, 33.4%) minmax(0, 1fr);
+  align-items: start;
+}
+
+/* Hugs the container's left edge. The column is ~33% wide (it sets the
+   heading offset), so centring here floats the label into open space. */
+.proc__vlabel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.9rem;
+}
+
+.proc__vlabel-text {
+  font-family: var(--font-ui);
+  /* Match the other section labels (.label) exactly — fixed 14px. */
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  color: var(--ink);
+  /* Reads bottom-to-top up the left edge. */
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  white-space: nowrap;
+}
+
+.proc__vlabel-square {
+  width: 9px;
+  height: 9px;
+  background: var(--ink);
+  flex: none;
+}
+
+.proc__heading {
+  font-family: var(--font-grotesk);
+  font-weight: var(--wght-display);
+  font-size: clamp(2rem, 3.75vw, 4.6rem);
+  letter-spacing: -0.04em;
+  line-height: 0.98;
+  max-width: 14ch;
+}
+
+/* 24px at wght 450 — lighter than the heading, and grey. */
+.proc__intro {
+  margin-top: 1.4rem;
+  font-family: var(--font-grotesk);
+  font-weight: 450;
+  font-size: clamp(1.05rem, 1.25vw, 1.5rem);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: rgb(115, 115, 115);
+  max-width: 42ch;
+}
+
+/* Body: steps left, numeral right. */
+.proc__layout {
+  display: grid;
+  /* Numeral column is the wider one: "01" at ~972px renders about 792px wide,
+     so an even split clips it. */
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: clamp(2rem, 5vw, 5rem);
+  /* Trimmed ~48px off the top gap (8rem → 5rem cap). */
+  margin-top: clamp(3rem, 9vw, 5rem);
+}
+
+.proc__steps {
+  /* No extra tail — the steps are a full viewport each, so the pinned numeral
+     already holds through the last one. A tail here only inflated the gap
+     between About and Testimonials, breaking the uniform section rhythm. */
+  padding-bottom: 0;
+}
+
+/* One full viewport each. Without this the steps collapse to content height
+   (~540px), two share the screen at once, and the numeral flips every half
+   screen — the reference gives each step a full viewport (4091 / 4). */
+.proc__step {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-block: clamp(2rem, 6vh, 4rem);
+  opacity: 0.35;
+  transition: opacity 0.5s var(--ease-out);
+}
+
+.proc__step.is-active {
+  opacity: 1;
+}
+
+/* (The last step keeps the full-viewport height so the sticky numeral stays
+   pinned and scrolls out together with the text, like the other steps.) */
+
+/* Rule with a square cap at its right end. */
+.proc__rule {
+  display: block;
+  position: relative;
+  height: 1px;
+  background: var(--line);
+  margin-bottom: clamp(1.5rem, 4vh, 2.5rem);
+}
+
+.proc__rule-dot {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  translate: 0 -50%;
+  width: 7px;
+  height: 7px;
+  background: var(--ink);
+}
+
+.proc__step-title {
+  font-family: var(--font-grotesk);
+  font-weight: var(--wght-display);
+  font-size: clamp(1.6rem, 2.2vw, 2.6rem);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.proc__duration {
+  display: block;
+  margin-top: 0.5rem;
+  font-family: var(--font-ui);
+  font-size: clamp(13px, 0.9vw, 15px);
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  color: #666;
+}
+
+.proc__items {
+  margin-top: clamp(1.5rem, 4vh, 2.5rem);
+  display: grid;
+  gap: clamp(1rem, 2.5vh, 1.6rem);
+}
+
+.proc__item-label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-ui);
+  font-size: clamp(1rem, 1.35vw, 1.3rem);
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.proc__item-square {
+  width: 7px;
+  height: 7px;
+  background: var(--ink);
+  flex: none;
+}
+
+.proc__item-body {
+  margin-top: 0.2rem;
+  padding-left: 1.3rem;
+  font-family: var(--font-grotesk);
+  font-size: clamp(1.05rem, 1.5vw, 1.45rem);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: #666;
+  max-width: 46ch;
+}
+
+/* Numeral pins for the whole run of steps. */
+.proc__sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Clipping window exactly one numeral tall — the strip slides behind it. */
+/* Sized off viewport HEIGHT, not width: the reference numeral is 800px of ink
+   in a 1080 viewport. Big Shoulders renders 0.82em of ink per em, so 800/0.82
+   = ~976px font = ~90vh. The window stays 1em so each strip cell matches it
+   and translateY(-100%) rolls exactly one numeral. */
+.proc__window {
+  font-family: var(--font-display);
+  /* Sized to FIT THE COLUMN, not to match the reference ink height.
+     Their numeral artwork is far more condensed (width:height 0.87) than
+     Big Shoulders (1.13), so matching their 800px height would render ~903px
+     wide and overflow the 796px column. 70vh fills the column instead. */
+  /* Bounded by BOTH height and width so it fits the numeral column — on
+     narrower (tablet) widths the height-only 70vh overflowed and clipped. */
+  font-size: clamp(4rem, min(70vh, 46vw), 820px);
+  /* 600, not 900. The hero wordmark is the ultra-black cut; the process
+     numeral is a lighter weight with noticeably thinner strokes and more
+     open counters. */
+  font-weight: 600;
+  line-height: 1;
+  height: 1em;
+  /* Explicit width of one numeral (~0.945em). The drum faces are absolutely
+     positioned, so without this the window collapses to 0 width and the digit
+     disappears. */
+  width: 0.96em;
+  overflow: hidden;
+  /* Depth for the 3D drum. em keeps the perspective proportional to the
+     numeral's own size whatever the viewport. */
+  perspective: 6em;
+}
+
+/* The drum: each numeral is a face; rotating this rolls the digit over in 3D. */
+.proc__strip {
+  position: relative;
+  display: block;
+  height: 1em;
+  transform-style: preserve-3d;
+  transition: transform 0.75s var(--ease-io);
+  will-change: transform;
+}
+
+.proc__num {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  height: 1em;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  backface-visibility: hidden;
+}
+
+@media (max-width: 767.98px) {
+  .proc__head {
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+  /* Steps on the left, the big numeral on the right. The numeral column is
+     sized to the numeral itself (max-content) and sits a short gap from the
+     text — a wide fixed column left a huge blank band between content and
+     count. The gap controls the distance between them. */
+  .proc__layout {
+    grid-template-columns: minmax(0, 1fr) max-content;
+    gap: 1.25rem;
+  }
+  .proc__sticky {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    align-items: center;
+    justify-content: center;
+  }
+  /* The numeral column is narrow on mobile. Two problems caused the "02" to be
+     cut off: (1) at 40vw the numeral was far bigger than its column, and (2)
+     the base window is only 0.96em wide — sized for a single digit — so a
+     two-digit numeral's ink overflowed the clip box. Shrink the font to fit the
+     column AND widen the window to hold two digits. */
+  /* Window is sized just wide enough to hold the widest two-digit numeral plus
+     the perspective overspill — no more, so the column stays snug to the digit
+     and sits close to the text. */
+  .proc__window {
+    font-size: min(32vw, 7.5rem);
+    width: 1.08em;
+    flex: none;
+  }
+  .proc__step,
+  .proc__step.is-active {
+    opacity: 1;
+  }
+  /* Content-height steps (a full viewport each left huge empty gaps), but still
+     enough scroll for the sticky numeral to hold through each one. */
+  .proc__step {
+    min-height: auto;
+    justify-content: flex-start;
+    padding-block: clamp(2rem, 8vw, 3.5rem);
+  }
+  /* Last step needs no bottom padding — it would just add dead space before the
+     card's rounded edge. */
+  .proc__step:last-child {
+    padding-bottom: 0;
+  }
+  /* No tail — the section's own --section-y padding provides the gap, uniform
+     with every other section. */
+  .proc__steps {
+    padding-bottom: 0;
+  }
+}
+
+/* Device is clickable while a project owns the view. Sits above .phone-3d so
+   it catches the click, and re-enables the pointer events that .phone-layer
+   switches off for the whole overlay. */
+.phone-link {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: auto;
+  border-radius: clamp(26px, 2.3vw, 40px);
+}
+
+/* Tech grid: a plain dark logo above the label — no tile, no shadow. */
+.brands__cell {
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.brands__icon {
+  display: grid;
+  place-items: center;
+  width: clamp(34px, 3vw, 44px);
+  height: clamp(34px, 3vw, 44px);
+}
+
+.brands__icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.brands__mark {
+  font-size: clamp(0.9rem, 1.1vw, 1.05rem);
+}

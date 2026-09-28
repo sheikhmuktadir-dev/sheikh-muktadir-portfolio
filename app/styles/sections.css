@@ -10,6 +10,11 @@
    arrive, and swaps its media per study — never unmounting. */
 .phone-track {
   position: relative;
+  /* Locked phone geometry, shared with the per-block stat cards so they line
+     up with the phone. Height mirrors .phone-stage; top mirrors TOP_LOCKED in
+     PhoneTrack.jsx (0.08 of the viewport). */
+  --phone-h: min(724px, 80vh);
+  --phone-top: 8vh;
   background-color: var(--bg);
   /* Dotted ground runs the full length — banner, statement AND case studies —
      matching the reference, whose tile spans all three (6514px) and rounds
@@ -192,7 +197,7 @@
   /* 724px on tall monitors (td-noise size); on shorter windows it caps to 80vh
      so the whole phone — rounded bottom included — stays on screen. Big, but
      never cut. */
-  height: min(724px, 80vh);
+  height: var(--phone-h);
   width: auto;
   aspect-ratio: 0.473011;
 }
@@ -374,7 +379,14 @@
   letter-spacing: -0.04em;
   line-height: 0.98;
   text-align: center;
-  max-width: none;
+  /* Lock the wrap to FOUR lines on every laptop, matching the big-monitor
+     layout (client request — the reference dropped to three lines at
+     1024–1440, which read inconsistent). The cap is in `ch`, so it scales with
+     the font size and the characters-per-line — and therefore the line count —
+     stay constant across viewports. At 1920 this is ≥ the text's natural
+     4-line width, so the large-desktop layout is unchanged. */
+  max-width: 37ch;
+  margin-inline: auto;
   /* Even the lines out so the last one is never a lonely short orphan —
      the browser redistributes words across lines for a balanced block
      rather than filling each line greedily and stranding a few words. */
@@ -448,14 +460,35 @@
 }
 
 /* Wrapper so the whole set can crossfade together. */
+/* Per-block card layer: one viewport tall, pinned to the block's top, so the
+   phone-sized box inside lands exactly on the locked phone when the block is
+   centred. Above the phone layer (see .cs__blocks z-index) and click-through. */
 .cs__stats {
   position: absolute;
-  inset: 0;
+  /* Centred on the block, not pinned to its top: at tablet the block is
+     shorter than the viewport, so "block centred in view" is not "block top
+     at viewport top". A viewport-tall layer centred on the block coincides
+     with the viewport exactly when the block is centred, on every size. */
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 100svh;
+  transform: translateY(-50%);
   pointer-events: none;
+  z-index: 3;
+}
+
+.cs__stats-box {
+  position: absolute;
+  left: 50%;
+  top: var(--phone-top);
+  height: var(--phone-h);
+  width: calc(var(--phone-h) * 0.473011);
+  transform: translateX(-50%);
 }
 
 /* Positions echo the reference: stepped, alternating sides of the phone. */
-/* Percentages are of the PHONE box (same wrapper as the banner pills). */
+/* Percentages are of the PHONE-SIZED box above. */
 .cs__stat:nth-child(1) {
   left: 86%;
   right: auto;
@@ -486,12 +519,32 @@
    after that, rather than trailing the phone's bottom edge as it settles. */
 .cs__blocks {
   position: relative;
-  z-index: 1;
+  /* NO stacking context here (z-index stays auto): that lets each piece layer
+     against the phone individually. The stat cards (.cs__stats, z-index 3) pass
+     OVER the pinned phone (z 2), while the PROJECT rule-row line falls behind it
+     — otherwise the full-width rule paints straight across the device like a
+     stray border. Content still sits above the dotted backdrop via DOM order.
+     The layer is click-through so the phone link underneath still works; real
+     content re-enables pointer events below. */
+  z-index: auto;
+  pointer-events: none;
   padding-top: clamp(620px, 125vh, 1500px);
-  /* Tail room so the sticky phone stays pinned through the LAST case study.
-     A sticky element releases once its containing block runs out, so without
-     this the phone scrolls away while the final study is still on screen. */
-  padding-bottom: clamp(300px, 55vh, 700px);
+  /* Tail room so the sticky phone stays pinned through the LAST case study, then
+     releases the MOMENT that project's content has passed — no drift over empty
+     dotted space at the section's bottom (td-noise stops the phone at the last
+     project; the old 55vh tail let it float ~300px past the cards). The phone
+     sits at top 0.08vh, height min(724px,0.8vh); it releases when the last
+     block's bottom rises to the phone's bottom, which lands exactly at a tail of
+     0.92vh − phoneHeight ≈ 12vh for laptop heights. Clamped so taller monitors
+     release a touch early (phone leaves WITH the content) rather than late. */
+  padding-bottom: clamp(72px, 12vh, 160px);
+}
+
+.cs__block > .cs__rule-row,
+.cs__block > .cs__cover,
+.cs__block > .cs__copy,
+.cs__block > .cs__cats {
+  pointer-events: auto;
 }
 
 .cs__block {
@@ -671,8 +724,8 @@
      columns aren't starved: a 0.85fr copy column was ~180px, which wrapped the
      description every 3-4 words. Shrink the phone and even out the tracks so the
      copy and categories each get real width and read cleanly. */
-  .phone-sticky .phone-stage {
-    height: min(500px, 54vh);
+  .phone-track {
+    --phone-h: min(500px, 54vh);
   }
   .cs__block {
     grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr) minmax(0, 1fr);
@@ -717,6 +770,9 @@
    sticky style) and the text is always fully readable, never cut. */
 /* Phones: simple single-column stack — image, then text, scrolling normally. */
 @media (max-width: 767.98px) {
+  .cs__stats {
+    display: none;
+  }
   .cs__blocks {
     padding-top: clamp(2rem, 8vw, 4rem);
     padding-bottom: clamp(2rem, 8vw, 4rem);
@@ -1490,7 +1546,7 @@
   place-items: center;
   height: 160px;
   padding: 1rem;
-  border: 1px solid rgba(20, 20, 20, 0.1);
+  border: 1px solid var(--line);
   border-radius: 8px;
   background: transparent;
   transition:
@@ -1499,7 +1555,7 @@
 }
 
 .brands__cell:hover {
-  border-color: rgba(20, 20, 20, 0.22);
+  border-color: color-mix(in srgb, var(--ink) 24%, transparent);
   transform: translateY(-3px);
 }
 
@@ -1914,6 +1970,29 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+
+/* DARK THEMES — many official brand marks are black/monochrome (Next.js,
+   JavaScript, Express, Framer, WordPress, Node…) and vanish on the dark ground.
+   Seat every icon on a clean light "chip" so both coloured and black logos read
+   — a premium tech-grid look that keeps the brand colours intact. Light themes
+   are untouched (logos sit on paper there already). */
+:root[data-theme$="-dark"] .brands__icon {
+  width: clamp(46px, 4.2vw, 58px);
+  height: clamp(46px, 4.2vw, 58px);
+  padding: clamp(8px, 0.9vw, 11px);
+  border-radius: 13px;
+  background: #f4f4f5;
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.06),
+    0 3px 12px -5px rgba(0, 0, 0, 0.55);
+  transition: transform 0.4s var(--ease-out), box-shadow 0.4s var(--ease-out);
+}
+:root[data-theme$="-dark"] .brands__cell:hover .brands__icon {
+  transform: translateY(-1px) scale(1.04);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.06),
+    0 6px 18px -6px rgba(0, 0, 0, 0.6);
 }
 
 .brands__mark {

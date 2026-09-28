@@ -1,0 +1,290 @@
+/* ===========================================================================
+   THEME — multi-palette system.
+
+   The whole app is token-driven (every colour routes through --bg / --ink /
+   --dark / --line …), so a theme is nothing more than a re-declaration of those
+   tokens under an attribute on <html>.
+
+   Axes
+     accent :  mono (default) · violet · rose · gold
+     mode   :  light · dark
+   combined into a single data-theme value: "<accent>" (light) or
+   "<accent>-dark". "mono" light is the base :root design, so it needs no block.
+
+   How the colour reads: --ink carries the accent (headlines, body, wordmark,
+   button fills all follow it), while --ink-soft / --ink-mute stay neutral grey
+   so secondary text keeps its contrast and the page never becomes a wall of a
+   single hue. Inverted blocks (footer / contact) tint their text (--dark-fg)
+   with the bright accent so they stay on-theme.
+
+   Applied before paint by the inline script in layout.js (no flash), toggled at
+   runtime by <ThemePicker>.
+   =========================================================================== */
+
+/* Shared dark-ground dot artwork: transparent-ish rect + white dots, screened
+   faintly over the dark surface so the texture survives without lightening the
+   whole block the way the light overlay tile would. */
+:root[data-theme$="-dark"] {
+  --dot-tile: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Crect width='96' height='96' fill='%23000000'/%3E%3Cg fill='%23ffffff'%3E%3Ccircle cx='24' cy='24' r='4'/%3E%3Ccircle cx='72' cy='24' r='4'/%3E%3Ccircle cx='24' cy='72' r='4'/%3E%3Ccircle cx='72' cy='72' r='4'/%3E%3C/g%3E%3C/svg%3E");
+  --dot-blend: screen;
+  --dot-opacity: 0.1;
+}
+
+/* ---------------------------------------------------------------------------
+   LIGHT · colour accents (paper ground, coloured ink)
+   --------------------------------------------------------------------------- */
+
+/* Brand hexes: violet #8b5cf6 · rose #f43f5e · gold #efb521. Those exact values
+   live on --accent (and drive the inverted footer text + FAB glow); the
+   light-mode --ink is a deepened shade of the SAME hue so text stays legible on
+   white (a bright accent at full strength is unreadable on paper), while
+   --ink-soft / --ink-mute stay near-neutral so secondary text keeps contrast. */
+
+:root[data-theme="violet"] {
+  --bg: #f5f3fc;  --bg-2: #ffffff;
+  --ink: #6d28d9;  --ink-soft: #656172;  --ink-mute: #9d99ab;
+  --line: rgba(139, 92, 246, 0.16);  --line-soft: rgba(139, 92, 246, 0.08);
+  --dark: #140f28;  --dark-fg: #b9a8ff;
+  --accent: #8b5cf6;
+}
+
+:root[data-theme="rose"] {
+  --bg: #fcf3f4;  --bg-2: #ffffff;
+  --ink: #c11d43;  --ink-soft: #6f6064;  --ink-mute: #a9989d;
+  --line: rgba(244, 63, 94, 0.16);  --line-soft: rgba(244, 63, 94, 0.08);
+  --dark: #23090f;  --dark-fg: #ff8298;
+  --accent: #f43f5e;
+}
+
+:root[data-theme="gold"] {
+  --bg: #faf6ec;  --bg-2: #ffffff;
+  --ink: #8a6510;  --ink-soft: #6a6357;  --ink-mute: #a49c8c;
+  --line: rgba(239, 181, 33, 0.22);  --line-soft: rgba(239, 181, 33, 0.11);
+  --dark: #1d1607;  --dark-fg: #f3c855;
+  --accent: #efb521;
+}
+
+/* ---------------------------------------------------------------------------
+   DARK · neutral + colour accents (dark ground, bright ink)
+   --------------------------------------------------------------------------- */
+
+/* Recipe for a premium dark ground: a deep, near-black canvas carrying only a
+   whisper of the accent hue (never a saturated tint — that reads muddy), with a
+   clearly-raised --bg-2 so cards/panels have real elevation. --ink-soft /
+   --ink-mute are kept mostly neutral (a faint accent warmth) so secondary text
+   stays crisp and the page doesn't drown in one hue. */
+
+:root[data-theme="mono-dark"] {
+  --bg: #0b0b0d;  --bg-2: #17171b;
+  --ink: #f5f5f6;  --ink-soft: #adadb3;  --ink-mute: #6c6c74;
+  --line: rgba(245, 245, 245, 0.13);  --line-soft: rgba(245, 245, 245, 0.06);
+  --dark: #141418;  --dark-fg: #f5f5f6;
+  --accent: #f5f5f6;
+}
+
+/* Dark colour themes: a deep, near-black canvas carrying only a whisper of the
+   hue (never a saturated tint — that reads muddy), a clearly-raised --bg-2 for
+   real card elevation, and a LIFTED accent as --ink (the full-strength brand hex
+   is a touch dark for body text on black, so each ink is brightened for punch
+   and legibility). --ink-soft / --ink-mute stay near-neutral. */
+
+:root[data-theme="violet-dark"] {
+  --bg: #0c0a16;  --bg-2: #17132b;
+  --ink: #b9a8ff;  --ink-soft: #9793b2;  --ink-mute: #635f81;
+  --line: rgba(139, 92, 246, 0.24);  --line-soft: rgba(139, 92, 246, 0.12);
+  --dark: #110d24;  --dark-fg: #b9a8ff;
+  --accent: #8b5cf6;
+}
+
+:root[data-theme="rose-dark"] {
+  --bg: #15080b;  --bg-2: #260f14;
+  --ink: #ff8298;  --ink-soft: #b58e94;  --ink-mute: #7c5b61;
+  --line: rgba(244, 63, 94, 0.24);  --line-soft: rgba(244, 63, 94, 0.12);
+  --dark: #1d0b0f;  --dark-fg: #ff8298;
+  --accent: #f43f5e;
+}
+
+:root[data-theme="gold-dark"] {
+  --bg: #120f06;  --bg-2: #1f1a0d;
+  --ink: #f3c855;  --ink-soft: #b3a781;  --ink-mute: #79715a;
+  --line: rgba(239, 181, 33, 0.22);  --line-soft: rgba(239, 181, 33, 0.11);
+  --dark: #1a1408;  --dark-fg: #f3c855;
+  --accent: #efb521;
+}
+
+/* ===========================================================================
+   FLOATING THEME PICKER
+   A fixed FAB (bottom-right, reachable from any section) that opens a small
+   panel of accent swatches + a light/dark toggle. Sits in the app z-ladder at
+   130 — above the nav (100) and cursor (120), below the intro preloader (200).
+   =========================================================================== */
+
+.tp {
+  position: fixed;
+  right: clamp(16px, 2.4vw, 28px);
+  bottom: clamp(16px, 2.4vw, 28px);
+  z-index: 130;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-end;
+  gap: 12px;
+  font-family: var(--font-ui);
+}
+
+/* --- The button ----------------------------------------------------------- */
+.tp-fab {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--bg);
+  border: 1px solid var(--ink);
+  box-shadow:
+    rgba(20, 20, 20, 0.16) 0 6px 18px -4px,
+    rgba(20, 20, 20, 0.12) 0 12px 34px -8px;
+  cursor: pointer;
+  isolation: isolate;
+  overflow: hidden;
+  transition: transform 0.45s var(--ease-out), box-shadow 0.45s var(--ease-out);
+}
+
+/* Soft accent halo that breathes so the control catches the eye without
+   nagging — the whole app ships with motion by rule. */
+.tp-fab::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  z-index: -1;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.35;
+  filter: blur(9px);
+  animation: tp-breathe 3.4s var(--ease-io) infinite;
+}
+
+@keyframes tp-breathe {
+  0%, 100% { transform: scale(0.9); opacity: 0.22; }
+  50%      { transform: scale(1.12); opacity: 0.42; }
+}
+
+.tp-fab:hover {
+  transform: translateY(-2px) scale(1.06);
+  box-shadow:
+    rgba(20, 20, 20, 0.22) 0 10px 24px -4px,
+    rgba(20, 20, 20, 0.16) 0 18px 44px -8px;
+}
+.tp-fab:active { transform: translateY(0) scale(0.96); }
+
+.tp-fab svg {
+  width: 22px;
+  height: 22px;
+  transition: transform 0.6s var(--ease-out);
+}
+.tp-fab[aria-expanded="true"] svg { transform: rotate(180deg); }
+
+/* --- The panel ------------------------------------------------------------ */
+.tp-panel {
+  width: 236px;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  box-shadow:
+    rgba(20, 20, 20, 0.10) 0 8px 24px -6px,
+    rgba(20, 20, 20, 0.14) 0 20px 48px -12px;
+  transform-origin: bottom right;
+}
+
+.tp-panel__title {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+  margin-bottom: 12px;
+}
+
+/* Swatch row */
+.tp-swatches {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.tp-swatch {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  cursor: pointer;
+  background: var(--sw);
+  box-shadow: inset 0 0 0 1px rgba(20, 20, 20, 0.12);
+  transition: transform 0.35s var(--ease-out), box-shadow 0.3s var(--ease-out);
+}
+.tp-swatch:hover { transform: scale(1.12); }
+.tp-swatch[data-active="true"] {
+  box-shadow:
+    0 0 0 2px var(--bg-2),
+    0 0 0 4px var(--sw);
+}
+/* Check mark on the active swatch */
+.tp-swatch[data-active="true"]::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 5px;
+  height: 9px;
+  border-style: solid;
+  border-color: var(--chk, #fff);
+  border-width: 0 2px 2px 0;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+/* Light / dark segmented toggle */
+.tp-mode {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 3px;
+  border-radius: 10px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+}
+.tp-mode__thumb {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: calc(50% - 3px);
+  border-radius: 8px;
+  background: var(--ink);
+  transition: transform 0.4s var(--ease-io);
+  z-index: 0;
+}
+.tp-mode[data-mode="dark"] .tp-mode__thumb { transform: translateX(100%); }
+.tp-mode__opt {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 32px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: color 0.4s var(--ease-out);
+}
+.tp-mode__opt[data-on="true"] { color: var(--bg-2); }
+.tp-mode__opt svg { width: 14px; height: 14px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .tp-fab::after { animation: none; }
+}

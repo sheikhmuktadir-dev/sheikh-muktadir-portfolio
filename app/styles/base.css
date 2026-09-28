@@ -19,6 +19,17 @@
   --line:      rgba(20, 20, 20, 0.14);
   --line-soft: rgba(20, 20, 20, 0.07);
 
+  /* Theme accent — the interactive/brand tint. Neutral by default; the colour
+     themes (see theme.css) point it at their hue. */
+  --accent:    var(--ink);
+
+  /* Dot-grid texture. Swapped per theme so it reads correctly on light AND
+     dark grounds (see theme.css). The default is the light-ground artwork:
+     black dots screened to pale grey via mix-blend overlay. */
+  --dot-tile: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Crect width='96' height='96' fill='%23ffffff'/%3E%3Cg fill='%23000000'%3E%3Ccircle cx='24' cy='24' r='4'/%3E%3Ccircle cx='72' cy='24' r='4'/%3E%3Ccircle cx='24' cy='72' r='4'/%3E%3Ccircle cx='72' cy='72' r='4'/%3E%3C/g%3E%3C/svg%3E");
+  --dot-blend: overlay;
+  --dot-opacity: 1;
+
   /* Type */
   --font-grotesk: var(--font-schibsted), "Helvetica Neue", Arial, sans-serif;
   --font-ui:      var(--font-dm-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
@@ -154,11 +165,12 @@ a { color: inherit; text-decoration: none; }
   z-index: 0;
   pointer-events: none;
   border-radius: inherit;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Crect width='96' height='96' fill='%23ffffff'/%3E%3Cg fill='%23000000'%3E%3Ccircle cx='24' cy='24' r='4'/%3E%3Ccircle cx='72' cy='24' r='4'/%3E%3Ccircle cx='24' cy='72' r='4'/%3E%3Ccircle cx='72' cy='72' r='4'/%3E%3C/g%3E%3C/svg%3E");
+  background-image: var(--dot-tile);
   background-size: 30px 30px;
   background-position: 50% 0;
   background-repeat: repeat;
-  mix-blend-mode: overlay;
+  mix-blend-mode: var(--dot-blend, overlay);
+  opacity: var(--dot-opacity, 1);
 }
 
 .label {

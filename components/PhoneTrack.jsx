@@ -8,7 +8,6 @@ import { INTRO_MS } from "@/lib/config";
 import Hero from "./Hero";
 import Statement from "./Statement";
 import CaseStudyBlocks from "./CaseStudyBlocks";
-import Counter from "./fx/Counter";
 
 const EASE = [0.22, 1, 0.36, 1];
 const BANNER_TILT = 6;   // deg — reference: rotate(6deg)
@@ -48,7 +47,7 @@ const START_SCALE = 1;
  * Two things change as you scroll:
  *   - tilt   5deg in the banner, reaching upright at the button
  *   - drift  banner -> below the statement -> locked position
- *   - media  the banner visual, then one per case study
+ *   - media  the banner visual, then one per case study (crossfade)
  *
  * Past the button nothing about the phone changes: it holds its position and
  * the case studies travel to it.
@@ -244,7 +243,8 @@ export default function PhoneTrack() {
               {/* Keyed swap rather than AnimatePresence, for the same reason
                   as the pills below: a stalled exit would leave every previous
                   image stacked inside the frame. The new one fades up over the
-                  tinted background, which reads as a crossfade anyway. */}
+                  tinted background, which reads as a crossfade anyway. The
+                  stat cards do NOT fade with it — they live in each block. */}
               <motion.div
                 key={mediaKey}
                 className="phone__media"
@@ -270,11 +270,13 @@ export default function PhoneTrack() {
             </motion.div>
             </div>
 
-            {/* Banner: capability pills. Case studies: that study's stats.
-                Deliberately NOT wrapped in AnimatePresence — an exiting set
-                stays mounted until its exit animation finishes, so whenever
-                rAF is throttled the old pills pile up instead of leaving.
-                Keying the wrapper lets React swap them outright. */}
+            {/* Banner: capability pills. Deliberately NOT wrapped in
+                AnimatePresence — an exiting set stays mounted until its exit
+                animation finishes, so whenever rAF is throttled the old pills
+                pile up instead of leaving. Keying the wrapper lets React swap
+                them outright. The case-study stat cards are NOT here: they
+                live in each block (CaseStudyBlocks) and scroll with the page
+                over the pinned phone, like the reference. */}
             {inBanner ? (
               <div className="phone-tags" key="tags" ref={tagsRef}>
                 {site.heroTags.map((tag, i) => (
@@ -293,22 +295,7 @@ export default function PhoneTrack() {
                   </motion.div>
                 ))}
               </div>
-            ) : (
-              <div className="cs__stats" key={`stats-${active}`}>
-                {current.stats.map((stat, i) => (
-                  <motion.div
-                    className="cs__stat"
-                    key={`${active}-${stat.label}`}
-                    initial={{ opacity: 0, y: 14, scale: 0.94 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    transition={{ duration: 0.5, delay: i * 0.07, ease: EASE }}
-                  >
-                    <Counter className="cs__stat-value" value={stat.value} />
-                    <span className="cs__stat-label">{stat.label}</span>
-                  </motion.div>
-                ))}
-              </div>
-            )}
+            ) : null}
           </div>
         </div>
       </div>

@@ -26,10 +26,7 @@ export default function Footer() {
           <Reveal>
             <div className="footer__col">
               <span className="footer__col-label">Get in touch</span>
-              <p className="footer__lead">
-                Available now for full-time front-end roles across web and
-                mobile. If you're hiring, let's talk.
-              </p>
+              <p className="footer__lead">{site.footerLead}</p>
               <a className="footer__email" href={`mailto:${site.email}`}>
                 {site.email}
               </a>

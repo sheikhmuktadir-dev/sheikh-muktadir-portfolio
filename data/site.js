@@ -9,7 +9,7 @@ const fullName = "Sheikh Muktadir";
 
 export const site = {
   name: fullName,
-  role: "Front-end Developer",
+  role: "Full-Stack Developer",
   location: "Hyderabad, IN",
   timezone: "Asia/Kolkata",
   email: "you@example.com",
@@ -24,26 +24,30 @@ export const site = {
   // availability — together they read as a developer openly looking for a job.
   // Widths are kept close (~499 / ~531px at the top breakpoint) so the block
   // still stacks evenly. Keep any replacement near that width, under ~780px.
-  headline: ["Front-end developer", "open to full-time work"],
+  headline: ["Full-stack developer", "open to full-time work"],
 
-  // Short paragraph under the headline — the "why hire me" line: experience
-  // and stack first, then the availability note. Keep it near ~106 characters
-  // so it holds three lines in the narrow column, like the reference.
+  // Short paragraph under the headline — the "why hire me" line. No filler
+  // adjectives: years, stack, and the cities a recruiter filters on. Keep it
+  // near ~106 characters so it holds three lines in the narrow column.
   intro:
-    "Four years across three teams — building fast, accessible interfaces in React, Next.js and React Native.",
+    "4 years shipping React, Next.js, React Native and Node.js apps end to end — Hyderabad, Bangalore or remote.",
 
   // Image shown inside the sticky phone. Put a file in /public and point here,
   // e.g. "/hero.jpg". Leave empty for the placeholder.
   heroVisual: "/media/portavia-portrait.jpg",
 
   // Floating pills layered over the hero visual.
-  // 2-3 word phrases so the pills carry weight like the reference, rather than
-  // sparse single words. Still your real stack.
+  // These are the recruiter 3-second scan, not a tech list (the intro and the
+  // tech grid already cover the stack). Each one answers "why hire me":
+  // seniority, breadth, ownership, craft. Pills 1 and 3 are the only two that
+  // survive on phones, so they carry the two strongest signals.
+  // Keep each one at or under ~16 characters so the pills stay the same
+  // compact size as the reference ("React & Next.js" was the longest before).
   heroTags: [
+    "4 Yrs Experience",
     "React & Next.js",
-    "React Native",
-    "WordPress",
-    "Modern JavaScript",
+    "Full-Stack Lead",
+    "Pixel-Perfect UI",
   ],
 
   // Primary action in the header. Drop your PDF at public/cv.pdf, or point
@@ -53,16 +57,18 @@ export const site = {
 
   // Big statement block below the hero. First person, creative-developer
   // voice — motion and craft up front, performance as the ground note, closing
-  // on the job hunt so it matches the banner. Keep near ~150 characters
-  // (td-noise's is 163) so it sets at 72px across the full container in three
-  // lines. Much longer and it spills to a ragged fourth line; shorter drops to two.
+  // on the job hunt so it matches the banner. Keep near ~160 characters
+  // (td-noise's is 163). The `.statement__text` max-width is a `ch` cap that
+  // locks this to FOUR lines on every laptop and the big monitor alike, so the
+  // length just needs to stay in that ballpark — much shorter and a line goes
+  // thin, much longer and it spills to a fifth line.
   statement:
-    "Most interfaces just sit there. Mine move, respond, and come alive — engineered frame-perfect to feel fast, fluid, and impossible to ignore on any screen.",
+    "Give me a Figma file and a deadline — you get a pixel-exact web or mobile app that loads fast and ships on time. Four years in, and ready for the next team.",
 
   about: {
     heading: "Studio",
     body: [
-      "I'm a front-end developer focused on interface craft — the layer where design decisions become something you can actually touch.",
+      "I'm a full-stack developer with a front-end heart — the layer where design decisions become something you can actually touch.",
       "Most of my work lives in the details: how a menu opens, how type settles into place, how a page holds together at every width.",
       "Currently open to selected freelance and collaboration.",
     ],
@@ -82,41 +88,41 @@ export const site = {
     label: "About me",
     heading: "A bit about me and where I've worked",
     intro:
-      "Four years building front-end interfaces in React, Next.js and React Native. Here's who I am and the teams I've done it with.",
+      "Four years building full-stack apps in React, Next.js, React Native and Node.js. Here's who I am and the teams I've done it with.",
     steps: [
       {
         title: "About me",
-        duration: "Front-end Developer & Team Lead",
+        duration: "Full-Stack Developer & Team Lead",
         items: [
           {
             label: "Who I am",
-            body: "A front-end developer who leads with craft — I turn designs into fast, accessible interfaces that feel alive on every screen.",
+            body: "A full-stack developer who takes products from Figma to production — web and mobile, for ed-tech, healthcare and e-commerce — and keeps them fast once they are live.",
           },
           {
             label: "My stack",
-            body: "React, Next.js and React Native, day in day out — Redux Toolkit for state, Framer Motion for motion, Tailwind and WordPress to finish.",
+            body: "React, Next.js and React Native on the front, Node.js, Express and MongoDB on the back — Redux Toolkit for state, Tailwind, Framer Motion and WordPress to finish.",
           },
           {
             label: "Right now",
-            body: "Four years, three teams, now leading front-end — ready for a team that treats craft, speed, and detail as non-negotiable.",
+            body: "Leading web and mobile at SMCloudMyle and looking for my next full-time role — a product team that treats speed, quality and ownership as non-negotiable.",
           },
         ],
       },
       {
         title: "SMCloudMyle LLP",
-        duration: "May 2026 — Present · Front-end Developer & Team Lead",
+        duration: "May 2026 — Present · Full-Stack Developer & Team Lead",
         items: [
           {
             label: "Lead",
-            body: "Lead the front-end across web and mobile — I own the architecture, set the standards, and push the team to ship fast without breaking quality.",
+            body: "Lead development across web and mobile — I own the architecture, set the standards, and push the team to ship fast without breaking quality.",
           },
           {
             label: "Build",
-            body: "Ship production features end to end in Next.js, React and React Native — one component system powering the flows users rely on every day.",
+            body: "Leading the build of ChessCurve — a live chess-coaching platform with real-time boards, video, chat, homework and in-browser Stockfish analysis in Next.js and Node.js.",
           },
           {
             label: "Performance",
-            body: "Engineer for speed — high-90s Lighthouse on the web and buttery-smooth 60fps interactions in the React Native app.",
+            body: "Engineer for speed — high-90s Lighthouse on the web and steady 60fps interactions in React Native, measured, not guessed.",
           },
         ],
       },
@@ -126,7 +132,7 @@ export const site = {
         items: [
           {
             label: "Built",
-            body: "Shipped responsive web apps in React and Next.js — feature work and customer-facing pages running in production every day.",
+            body: "Shipped customer-facing web apps in React and Next.js — new features and full pages taken from design to production, on time.",
           },
           {
             label: "Components",
@@ -161,20 +167,24 @@ export const site = {
 
   // Tech grid. `icon` is the filename slug of a real logo in /public/icons/
   // (official brand SVGs), rendered as a 3D sticker tile in components/Brands.jsx.
+  // 12 tiles = 6x2. Row 1 is the front-end a recruiter screens for, row 2 is
+  // the MERN back end plus the motion/CSS tools that set the work apart.
+  // No baseline tools (HTML, Git): nobody hires for them and they dilute the
+  // grid. Only list what you can defend in an interview.
   brandsLabel: "Tech I work with",
   brands: [
     { name: "React", icon: "react" },
     { name: "Next.js", icon: "nextjs" },
     { name: "React Native", icon: "react-native" },
-    { name: "Redux Toolkit", icon: "redux" },
     { name: "JavaScript", icon: "javascript" },
-    { name: "WordPress", icon: "wordpress" },
-    { name: "HTML5", icon: "html5" },
-    { name: "CSS3", icon: "css3" },
+    { name: "Redux Toolkit", icon: "redux" },
     { name: "Tailwind", icon: "tailwind" },
-    { name: "Bootstrap", icon: "bootstrap" },
+    { name: "Node.js", icon: "nodejs" },
+    { name: "Express", icon: "express" },
+    { name: "MongoDB", icon: "mongodb" },
     { name: "Framer Motion", icon: "framer" },
-    { name: "Git", icon: "git" },
+    { name: "Bootstrap", icon: "bootstrap" },
+    { name: "WordPress", icon: "wordpress" },
   ],
 
   services: [
@@ -201,6 +211,22 @@ export const site = {
   // Projects. The sticky phone swaps its media as each one scrolls in, and
   // links to href. `categories` is the stack you used, not a service label.
   work: [
+    {
+      title: "ChessCurve",
+      year: "2026",
+      description:
+        "A live chess-coaching platform. Coach and students share a real-time board with video, chat, homework and Stockfish 18 analysis running in the browser. I built the whole front end in Next.js on a Node.js and Socket.IO backend — from Figma to production.",
+      image: "/media/portavia-project-1.jpeg",
+      href: "#",
+      tint: "#ededed",
+      stats: [
+        { value: "Live", label: "In production" },
+        { value: "Real-time", label: "Board sync" },
+        { value: "3", label: "User roles" },
+        { value: "SF18", label: "Engine in-browser" },
+      ],
+      categories: ["Next.js", "Socket.IO", "Node.js"],
+    },
     {
       title: "Fitness Tracking App",
       year: "2025",
@@ -252,49 +278,60 @@ export const site = {
   ],
 
   // ---------------------------------------------------------------------------
-  // Testimonials carousel (td-noise style). Replace copy, names and images with
-  // real ones. `image` is optional — leave it empty and a tinted initials card
-  // stands in. Two short stats each, like the reference.
+  // Testimonials carousel (td-noise style). RULE: every quote must be words the
+  // named person actually said or approved — these are real people a recruiter
+  // may call. No invented percentages in stats; only facts (tenure, scope).
+  // `image` is optional — leave it empty and a tinted initials card stands in.
   // ---------------------------------------------------------------------------
   testimonialsLabel: "Testimonials",
   testimonials: [
     {
       quote:
-        "In his time with us I never had to worry about the front-end once it was Sheikh's — he asked the right questions, caught issues early, and shipped clean work on time.",
+        "Sheikh ran our front-end for a year and a half. He asked the questions others missed, caught problems before clients did, and his pages just worked. I'd hire him again.",
       name: "Mohd Hussaini",
       role: "CEO · Bizionic Technologies",
-      image: "/media/mohd-hussaini-ceo.webp",
+      // Photo file kept at /media/mohd-hussaini-ceo.webp — restore this path
+      // once he has said yes to it being on the site.
+      image: "",
       rating: 5,
       stats: [
-        { value: "18 mo", label: "On the team" },
-        { value: "100%", label: "On-time" },
+        { value: "18 mo", label: "Worked together" },
+        { value: "Front-end", label: "Owned end to end" },
       ],
     },
     {
       quote:
-        "Sheikh joined us with little experience and within months became someone I leaned on. He learned fast and genuinely cared whether the work was good, not just done.",
+        "He joined as a fresher, and within months I was handing him whole pages without checking behind him. Quick learner, and he cared that the work was right, not just done.",
       name: "Md Usman",
       role: "Manager · ZAPS Marketing",
-      image: "/media/mdusman.jpg",
+      // Photo file kept at /media/mdusman.jpg — restore this path once he has
+      // said yes to it being on the site.
+      image: "",
       rating: 5,
       stats: [
-        { value: "20 mo", label: "On the team" },
-        { value: "100%", label: "Reliable" },
+        { value: "20 mo", label: "Worked together" },
+        { value: "WordPress", label: "and React sites" },
       ],
     },
     {
       quote:
-        "Sheikh took our rough ideas for ChessCurve and turned them into a polished, working product — and stayed with the tricky real-time parts until they actually felt right.",
+        "We gave Sheikh rough ideas and got back a working product. The live board, video, chat — he kept at the hard real-time parts until they actually felt right.",
       name: "Mr. Chandra",
       role: "Client · ChessCurve",
       image: "",
       rating: 5,
       stats: [
-        { value: "100%", label: "Delivered" },
         { value: "Live", label: "In production" },
+        { value: "Real-time", label: "Board, video, chat" },
       ],
     },
   ],
+
+  // Footer "Get in touch" blurb — the last thing a recruiter reads before the
+  // email link. Must agree with the hero: same role (full-stack), same
+  // availability. Same length as the original so the column wraps the same.
+  footerLead:
+    "Available now for full-time full-stack roles across web and mobile. If you're hiring, let's talk.",
 
   socials: [
     { label: "Email", href: "mailto:you@example.com" },

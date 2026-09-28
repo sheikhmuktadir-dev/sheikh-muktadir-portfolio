@@ -143,11 +143,11 @@
 }
 
 .fx-cursor-prog__arc {
-  stroke: var(--ink);
+  stroke: var(--accent);
 }
 
 .fx-cursor-prog__track {
-  stroke: rgba(20, 20, 20, 0.16);
+  stroke: color-mix(in srgb, var(--ink) 16%, transparent);
 }
 
 /* The cursor is desktop-only -- its companions must follow it, or they hang

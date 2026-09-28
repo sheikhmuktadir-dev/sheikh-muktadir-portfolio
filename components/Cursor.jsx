@@ -127,7 +127,9 @@ export default function Cursor() {
     };
   }, [x, y]);
 
-  const ringScale = label ? 2.3 : hovering ? 1.65 : 1;
+  // Labelled state is a pill sized by CSS (not a scaled-up circle), so it keeps
+  // its natural scale; plain hover still swells the ring.
+  const ringScale = label ? 1 : hovering ? 1.65 : 1;
 
   return (
     <>

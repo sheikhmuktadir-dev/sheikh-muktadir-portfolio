@@ -37,6 +37,23 @@ export default function CaseStudyBlocks({ blockRefs }) {
               </span>
             </div>
 
+            {/* Desktop stat cards. They belong to the BLOCK, not the pinned
+                phone, so they scroll with the copy and pass over the phone at
+                page speed — exactly like the reference. No entrance fade: they
+                are simply there, and the Counter still counts up in view. The
+                box is phone-sized and sits where the locked phone sits when
+                this block is centred, so the cards line up with it then. */}
+            <div className="cs__stats" aria-hidden="true">
+              <div className="cs__stats-box">
+                {item.stats.map((stat) => (
+                  <div className="cs__stat" key={stat.label}>
+                    <Counter className="cs__stat-value" value={stat.value} />
+                    <span className="cs__stat-label">{stat.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             {/* Inline cover — mobile only. On phones the shared sticky phone
                 fades out in this section (it covers the text), so each project
                 shows its own image stacked above the copy, like td-noise. */}

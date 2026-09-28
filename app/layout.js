@@ -6,7 +6,12 @@ import Cursor from "@/components/Cursor";
 import Preloader from "@/components/Preloader";
 import Nav from "@/components/Nav";
 import FxLayer from "@/components/fx/FxLayer";
+import ThemePicker from "@/components/ThemePicker";
 import { site } from "@/data/site";
+
+// Applies the saved theme to <html> BEFORE first paint, so a reload never
+// flashes the default palette before React hydrates. Kept tiny and inline.
+const themeBootstrap = `(function(){try{var a=localStorage.getItem('pf-accent')||'mono';var m=localStorage.getItem('pf-mode')||'light';document.documentElement.setAttribute('data-theme',m==='dark'?a+'-dark':a);}catch(e){}})();`;
 
 // Fonts are self-hosted from ./fonts rather than fetched via next/font/google.
 // The Google loader downloads the woff2 files at BUILD time, and that fetch is
@@ -55,7 +60,7 @@ const bigShoulders = localFont({
 });
 
 export const metadata = {
-  title: `${site.name} — ${site.role}`,
+  title: `${site.name} — ${site.role} · React, Next.js & React Native · Hyderabad`,
   description: site.intro,
 };
 
@@ -67,12 +72,20 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
+      // The theme bootstrap sets data-theme on <html> before hydration, so the
+      // attribute intentionally differs from the server markup.
+      suppressHydrationWarning
       className={`${schibsted.variable} ${dmMono.variable} ${bigShoulders.variable}`}
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
+      </head>
       <body>
         <Preloader name={site.wordmark} />
         <FxLayer />
         <Cursor />
+        {/* Outside SmoothScroll: its transform would trap this fixed element. */}
+        <ThemePicker />
         <SmoothScroll>
           <Nav />
           <main>{children}</main>

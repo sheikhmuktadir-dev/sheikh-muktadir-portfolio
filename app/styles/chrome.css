@@ -32,12 +32,56 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ink);
+  /* Morphs smoothly from circle → pill when a label appears. */
+  transition:
+    width 0.4s var(--ease-out),
+    height 0.4s var(--ease-out),
+    margin 0.4s var(--ease-out),
+    border-radius 0.4s var(--ease-out),
+    background 0.3s var(--ease-out),
+    border-color 0.3s var(--ease-out),
+    color 0.3s var(--ease-out),
+    box-shadow 0.3s var(--ease-out);
 }
 
+/* Labelled state is a FROSTED GLASS PILL — a different form from the plain
+   disc: translucent, blurred, with an accent rim, a light sheen that sweeps
+   across on a loop, and "VIEW ›" whose chevron nudges. */
 .cursor-ring.is-labelled {
-  background: var(--ink);
-  color: var(--bg);
-  border-color: var(--ink);
+  width: 96px;
+  height: 40px;
+  margin: -20px 0 0 -48px;         /* re-centre the wider pill on the cursor */
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg-2) 70%, transparent);
+  backdrop-filter: blur(9px);
+  border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  color: var(--ink);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 10px 30px -8px color-mix(in srgb, var(--accent) 50%, transparent);
+  overflow: hidden;
+}
+
+/* Diagonal light sweep across the glass. */
+.cursor-ring.is-labelled::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    115deg,
+    transparent 34%,
+    color-mix(in srgb, var(--accent) 34%, transparent) 50%,
+    transparent 66%
+  );
+  transform: translateX(-120%);
+  animation: cursor-sheen 2.4s var(--ease-io) infinite;
+}
+
+@keyframes cursor-sheen {
+  0%        { transform: translateX(-120%); }
+  55%, 100% { transform: translateX(120%); }
 }
 
 .cursor-ring__label {
@@ -45,11 +89,33 @@
   transform: scale(0.7);
   transition: opacity 0.25s var(--ease-out), transform 0.25s var(--ease-out);
   white-space: nowrap;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  padding-left: 0.16em;                 /* optical re-centre for tracked caps */
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
 }
 
 .cursor-ring.is-labelled .cursor-ring__label {
   opacity: 1;
   transform: scale(1);
+}
+
+/* Chevron drawn from borders (no font-glyph dependency), nudging on a loop. */
+.cursor-ring.is-labelled .cursor-ring__label::after {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-right: 1.6px solid currentColor;
+  border-top: 1.6px solid currentColor;
+  transform: rotate(45deg);
+  animation: cursor-chev 1.5s var(--ease-out) infinite;
+}
+
+@keyframes cursor-chev {
+  0%, 100% { transform: rotate(45deg) translate(0, 0); }
+  50%      { transform: rotate(45deg) translate(2px, -2px); }
 }
 
 @media (hover: none), (pointer: coarse) {

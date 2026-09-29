@@ -700,13 +700,22 @@
   white-space: nowrap;
 }
 
-/* Below desktop width the floating stat cards crowd the phone — hide them, but
-   keep the 3-column text layout so the phone still floats over the empty middle
-   column instead of over the text. */
-@media (max-width: 1000px) {
-  .cs__stat {
-    display: none;
-  }
+/* Floating stat cards: hidden only on PHONES (the .cs__stats layer itself is
+   display:none < 768, and each block shows .cs__cover-stats instead). On tablet
+   AND small laptops they STAY — but repositioned (below) to the phone's right
+   edge, since the desktop's alternating left/right positions place two cards out
+   over the copy column, which is too close to the phone until the viewport is
+   wide enough (~1280px). */
+@media (max-width: 1279.98px) {
+  /* Stack all four cards on the phone's RIGHT edge, staggered down. The copy
+     always sits on the LEFT here, so the right side is collision-free on every
+     project at every width in this range (verified 768–1100). Percentages are of
+     the phone-sized stats box, so they scale with the phone at each breakpoint.
+     At >=1280 the base alternating positions take over (the columns have room). */
+  .cs__stat:nth-child(1) { left: 58%; right: auto; top: 12%; }
+  .cs__stat:nth-child(2) { left: 64%; right: auto; top: 33%; }
+  .cs__stat:nth-child(3) { left: 55%; right: auto; top: 54%; }
+  .cs__stat:nth-child(4) { left: 61%; right: auto; top: 75%; }
 }
 
 /* Inline project cover — desktop hides it (the sticky phone shows the media);
@@ -731,6 +740,8 @@
     grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr) minmax(0, 1fr);
     gap: 1rem;
   }
+  /* (Stat-card positions for tablet AND small laptop live in the shared
+     max-width:1279.98 block below — the copy collision happens at both sizes.) */
   .cs__copy {
     max-width: none;
   }
@@ -744,16 +755,22 @@
      phone and rolling numeral. */
   .cs__blocks {
     padding-top: clamp(140px, 32vh, 360px);
-    /* Tail keeps the sticky phone pinned & centred THROUGH the last project: the
-       phone unpins over the final ~1 viewport of this track, so the last block
-       must still have room below it when it crosses the viewport middle (which
-       is what switches the phone to project 03 and holds it there). Trimmed from
-       the desktop tail but NOT starved — cutting it too far unpins the phone
-       before it reaches project 03. */
-    padding-bottom: clamp(90px, 18vh, 200px);
+    /* Tail keeps the sticky phone pinned & centred THROUGH the last project, then
+       releases it WITH the content. Trimmed hard on tablet: with each block now a
+       full 100svh (below), the block itself provides the scroll room the phone
+       needs, so a big tail here only stacks dead dotted space under the LAST
+       project (the "huge gap at the bottom" on portrait tablets, where vh≈1024 >
+       the old 78svh block). Small tail = the next section follows cleanly. */
+    padding-bottom: clamp(40px, 6vh, 80px);
   }
+  /* Fill the viewport. A 78svh block was ~220px SHORTER than a portrait tablet's
+     ~1024px height, so on the last project the content (which distributes with
+     align-content: space-between) clustered in the top ~60% and left a huge empty
+     band below, with the phone parked high. 100svh lets space-between push the
+     categories to the true bottom and the phone sit centred — the composition
+     fills the screen, exactly like desktop (which is already 100svh). */
   .cs__block {
-    min-height: 78svh;
+    min-height: 100svh;
   }
   /* Extra specificity so it beats the base .proc__step { min-height: 100svh }
      which appears later in the file. */
@@ -920,6 +937,17 @@
 #testimonials {
   margin-bottom: 24px;
   border-radius: 0 0 24px 24px;
+}
+
+/* Seam fix: the brands → about → testimonials sections are one light (#f5f5f5)
+   panel on a DARK body (#141414). Under smooth scroll the boundary between two
+   stacked sections can land on a sub-pixel row, opening a hairline gap that
+   flashes the dark body through as a thin line (seen between Tech and About).
+   Overlap About onto Brands by 1px so a gap can never open — invisible, since
+   both surfaces are the same colour. (About → Testimonials already overlaps via
+   the negative margin below.) */
+#about {
+  margin-top: -1px;
 }
 
 /* Tablet/desktop: About ends with a big block of scroll room for the rolling
@@ -1185,10 +1213,33 @@
   }
 }
 
-/* Tablet: keep two columns but relax the gap. */
+/* Tablet: keep two columns but relax the gap, and SHRINK the portrait card.
+   The desktop middle column is clamp(260px, 40vw, 332px) — at ~768px that 40vw
+   lands near the 332 desktop max, so the tall 8/15 card (~575px) dominated the
+   narrower tablet and starved the quote column. A smaller, capped width keeps the
+   card proportionate and gives the quote room to breathe. */
 @media (max-width: 1023.98px) {
   .testi__grid {
+    grid-template-columns: minmax(0, 1fr) clamp(190px, 26vw, 240px) minmax(0, 0.1fr);
     gap: clamp(1.5rem, 4vw, 3rem);
+  }
+  .testi__stat:nth-child(1) {
+    left: -3%;
+  }
+  .testi__stat:nth-child(2) {
+    right: -3%;
+  }
+}
+
+/* Small laptop (1024–1280): the desktop card column pins at its 332px max from
+   ~830px up, so on a small laptop the card is full desktop size while the quote
+   column is narrower — the card looks huge and the quote wraps into it. Give this
+   range an intermediate, scaling width (bigger than tablet's, smaller than
+   desktop's) so the card is proportionate and the quote clears it. */
+@media (min-width: 1024px) and (max-width: 1279.98px) {
+  .testi__grid {
+    grid-template-columns: minmax(0, 1fr) clamp(250px, 24vw, 300px) minmax(0, 0.1fr);
+    gap: clamp(2rem, 4vw, 3rem);
   }
   .testi__stat:nth-child(1) {
     left: -3%;
@@ -1576,13 +1627,17 @@
   }
 }
 
-/* Mobile marquee — hidden on desktop/tablet (the grid shows there instead). */
+/* Marquee — hidden from medium laptops up (the static grid shows there ≥1280).
+   Phones, tablets and SMALL laptops get the sliding rows (see the swap below). */
 .brands__marquee {
   display: none;
 }
 
-@media (max-width: 767.98px) {
-  /* Swap the static grid for two opposing marquee rows. */
+@media (max-width: 1279.98px) {
+  /* Swap the static grid for two opposing marquee (slider) rows — on small
+     laptops as well as tablets and phones, so the tech row slides instead of
+     standing as a tall static grid. Medium laptops and desktops (≥1280) keep the
+     grid, which has the width for a clean multi-column layout. */
   .brands__grid {
     display: none;
   }
@@ -1618,10 +1673,12 @@
   .brands__row--rtl .brands__track {
     animation: brands-rtl 26s linear infinite;
   }
+  /* Tile size scales with the viewport so the slider reads well from a phone up
+     to a medium laptop (small on phones, larger on laptops). */
   .brands__marquee .brands__cell {
     flex: none;
-    width: 128px;
-    height: 118px;
+    width: clamp(128px, 12vw, 168px);
+    height: clamp(118px, 11vw, 150px);
   }
 }
 

@@ -22,9 +22,9 @@ import { AnimatePresence, motion } from "framer-motion";
 // top of it (the neon lime needs a dark tick, the rest take white).
 const ACCENTS = [
   { id: "mono",   label: "Default", swatch: "#141414", check: "#ffffff" },
-  { id: "violet", label: "Violet",  swatch: "#8b5cf6", check: "#ffffff" },
+  { id: "violet", label: "Violet",  swatch: "#7c5cff", check: "#ffffff" },
   { id: "rose",   label: "Rose",    swatch: "#f43f5e", check: "#ffffff" },
-  { id: "gold",   label: "Gold",    swatch: "#efb521", check: "#141414" },
+  { id: "gold",   label: "Gold",    swatch: "#cf9a2e", check: "#ffffff" },
 ];
 
 const themeAttr = (accent, mode) =>

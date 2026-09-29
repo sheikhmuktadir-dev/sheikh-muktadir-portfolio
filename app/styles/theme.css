@@ -11,11 +11,20 @@
    combined into a single data-theme value: "<accent>" (light) or
    "<accent>-dark". "mono" light is the base :root design, so it needs no block.
 
-   How the colour reads: --ink carries the accent (headlines, body, wordmark,
-   button fills all follow it), while --ink-soft / --ink-mute stay neutral grey
-   so secondary text keeps its contrast and the page never becomes a wall of a
-   single hue. Inverted blocks (footer / contact) tint their text (--dark-fg)
-   with the bright accent so they stay on-theme.
+   How the colour reads (matches the default's restraint): the design is paper +
+   near-black charcoal, so a colour theme keeps that editorial calm — it does NOT
+   flood every headline and paragraph with a hue. Instead:
+     --ink       a DEEP tinted charcoal — reads near-black, with the hue only as
+                 an undertone, so text stays legible and the page never becomes a
+                 wall of one loud colour (the old themes' mistake).
+     --bg        paper with a whisper of tint; --bg-2 stays clean white for cards.
+     --accent    the one true pop of colour — the FAB glow, link/cursor accents.
+                 Kept vivid because it appears in only a few, deliberate places.
+     inverted    footer / contact tint their ground (--dark) with the hue and set
+                 near-white tinted text (--dark-fg) — premium, not neon.
+   Dark themes follow the same rule: near-black ground, tinted near-white ink,
+   vivid accent for the few pops. This reads professional and on-brand without the
+   page turning monochromatically purple/rose/gold.
 
    Applied before paint by the inline script in layout.js (no flash), toggled at
    runtime by <ThemePicker>.
@@ -34,34 +43,35 @@
    LIGHT · colour accents (paper ground, coloured ink)
    --------------------------------------------------------------------------- */
 
-/* Brand hexes: violet #8b5cf6 · rose #f43f5e · gold #efb521. Those exact values
-   live on --accent (and drive the inverted footer text + FAB glow); the
-   light-mode --ink is a deepened shade of the SAME hue so text stays legible on
-   white (a bright accent at full strength is unreadable on paper), while
-   --ink-soft / --ink-mute stay near-neutral so secondary text keeps contrast. */
+/* Accents (the one true pop of colour): violet #7c5cff · rose #f43f5e ·
+   gold #cf9a2e. Text (--ink) is NOT the accent — it is a deep charcoal carrying
+   only a faint undertone of the hue, so headlines and body read near-black and
+   the page keeps the default's editorial calm. --ink-soft / --ink-mute stay
+   near-neutral. The colour shows in the paper tint, the accent pops and the
+   inverted blocks — never as a wall of coloured text. */
 
 :root[data-theme="violet"] {
-  --bg: #f5f3fc;  --bg-2: #ffffff;
-  --ink: #6d28d9;  --ink-soft: #656172;  --ink-mute: #9d99ab;
-  --line: rgba(139, 92, 246, 0.16);  --line-soft: rgba(139, 92, 246, 0.08);
-  --dark: #140f28;  --dark-fg: #b9a8ff;
-  --accent: #8b5cf6;
+  --bg: #f2eefb;  --bg-2: #ffffff;
+  --ink: #221b30;  --ink-soft: #676274;  --ink-mute: #9c98a8;
+  --line: rgba(124, 92, 255, 0.16);  --line-soft: rgba(124, 92, 255, 0.08);
+  --dark: #16111f;  --dark-fg: #ece9f6;
+  --accent: #7c5cff;  --accent-ink: #7c5cff;
 }
 
 :root[data-theme="rose"] {
-  --bg: #fcf3f4;  --bg-2: #ffffff;
-  --ink: #c11d43;  --ink-soft: #6f6064;  --ink-mute: #a9989d;
-  --line: rgba(244, 63, 94, 0.16);  --line-soft: rgba(244, 63, 94, 0.08);
-  --dark: #23090f;  --dark-fg: #ff8298;
-  --accent: #f43f5e;
+  --bg: #fbeff1;  --bg-2: #ffffff;
+  --ink: #2a161a;  --ink-soft: #6d6165;  --ink-mute: #a89a9d;
+  --line: rgba(244, 63, 94, 0.15);  --line-soft: rgba(244, 63, 94, 0.08);
+  --dark: #1e1013;  --dark-fg: #f6ebed;
+  --accent: #f43f5e;  --accent-ink: #f43f5e;
 }
 
 :root[data-theme="gold"] {
-  --bg: #faf6ec;  --bg-2: #ffffff;
-  --ink: #8a6510;  --ink-soft: #6a6357;  --ink-mute: #a49c8c;
-  --line: rgba(239, 181, 33, 0.22);  --line-soft: rgba(239, 181, 33, 0.11);
-  --dark: #1d1607;  --dark-fg: #f3c855;
-  --accent: #efb521;
+  --bg: #f8f2e4;  --bg-2: #ffffff;
+  --ink: #262012;  --ink-soft: #67614f;  --ink-mute: #a29a86;
+  --line: rgba(191, 138, 30, 0.24);  --line-soft: rgba(191, 138, 30, 0.11);
+  --dark: #1a1408;  --dark-fg: #f4eedd;
+  --accent: #cf9a2e;  --accent-ink: #cf9a2e;
 }
 
 /* ---------------------------------------------------------------------------
@@ -79,37 +89,59 @@
   --ink: #f5f5f6;  --ink-soft: #adadb3;  --ink-mute: #6c6c74;
   --line: rgba(245, 245, 245, 0.13);  --line-soft: rgba(245, 245, 245, 0.06);
   --dark: #141418;  --dark-fg: #f5f5f6;
-  --accent: #f5f5f6;
+  --accent: #f5f5f6;  --accent-ink: #f5f5f6;
 }
 
 /* Dark colour themes: a deep, near-black canvas carrying only a whisper of the
    hue (never a saturated tint — that reads muddy), a clearly-raised --bg-2 for
-   real card elevation, and a LIFTED accent as --ink (the full-strength brand hex
-   is a touch dark for body text on black, so each ink is brightened for punch
-   and legibility). --ink-soft / --ink-mute stay near-neutral. */
+   real card elevation, and TINTED NEAR-WHITE ink (not neon coloured text — that
+   read cheap). The hue lives in the accent pops and the faint ground warmth;
+   --ink-soft / --ink-mute stay near-neutral so secondary text stays crisp. */
 
 :root[data-theme="violet-dark"] {
-  --bg: #0c0a16;  --bg-2: #17132b;
-  --ink: #b9a8ff;  --ink-soft: #9793b2;  --ink-mute: #635f81;
-  --line: rgba(139, 92, 246, 0.24);  --line-soft: rgba(139, 92, 246, 0.12);
-  --dark: #110d24;  --dark-fg: #b9a8ff;
-  --accent: #8b5cf6;
+  --bg: #0c0a12;  --bg-2: #16131e;
+  --ink: #ece9f5;  --ink-soft: #a5a1b2;  --ink-mute: #6d6a7b;
+  --line: rgba(124, 92, 255, 0.22);  --line-soft: rgba(124, 92, 255, 0.11);
+  --dark: #131120;  --dark-fg: #ece9f5;
+  --accent: #8f7bff;  --accent-ink: #7c5cff;
 }
 
 :root[data-theme="rose-dark"] {
-  --bg: #15080b;  --bg-2: #260f14;
-  --ink: #ff8298;  --ink-soft: #b58e94;  --ink-mute: #7c5b61;
-  --line: rgba(244, 63, 94, 0.24);  --line-soft: rgba(244, 63, 94, 0.12);
-  --dark: #1d0b0f;  --dark-fg: #ff8298;
-  --accent: #f43f5e;
+  --bg: #110a0c;  --bg-2: #1d1418;
+  --ink: #f4e9eb;  --ink-soft: #afa1a4;  --ink-mute: #766769;
+  --line: rgba(244, 63, 94, 0.22);  --line-soft: rgba(244, 63, 94, 0.11);
+  --dark: #190f12;  --dark-fg: #f4e9eb;
+  --accent: #ff6076;  --accent-ink: #f43f5e;
 }
 
 :root[data-theme="gold-dark"] {
-  --bg: #120f06;  --bg-2: #1f1a0d;
-  --ink: #f3c855;  --ink-soft: #b3a781;  --ink-mute: #79715a;
-  --line: rgba(239, 181, 33, 0.22);  --line-soft: rgba(239, 181, 33, 0.11);
-  --dark: #1a1408;  --dark-fg: #f3c855;
-  --accent: #efb521;
+  --bg: #0f0c06;  --bg-2: #1a1610;
+  --ink: #f2ecdd;  --ink-soft: #a9a18f;  --ink-mute: #736c5b;
+  --line: rgba(207, 154, 46, 0.24);  --line-soft: rgba(207, 154, 46, 0.12);
+  --dark: #161107;  --dark-fg: #f2ecdd;
+  --accent: #e3b246;  --accent-ink: #cf9a2e;
+}
+
+/* ---------------------------------------------------------------------------
+   COLOURED DISPLAY TYPE — makes a theme actually READ as themed.
+
+   The default (mono, no colour) is excluded, so it is untouched. For every
+   colour theme the big display elements — wordmark, hero headline, project
+   titles and the marker squares — take --accent-ink (a rich, readable shade of
+   the accent). Body copy, descriptions and pills stay neutral --ink, so the
+   colour is clearly visible on the type that carries the brand without the page
+   becoming a wall of one hue. This is the "coloured headlines, neutral body"
+   pattern — visible and professional at once.
+   --------------------------------------------------------------------------- */
+:root[data-theme]:not([data-theme="mono"]) .nav__brand,
+:root[data-theme]:not([data-theme="mono"]) .hero__headline,
+:root[data-theme]:not([data-theme="mono"]) .hero__wordmark,
+:root[data-theme]:not([data-theme="mono"]) .cs__title {
+  color: var(--accent-ink);
+}
+/* Marker squares echo the accent so the theme signature repeats down the page. */
+:root[data-theme]:not([data-theme="mono"]) .cs__square {
+  background: var(--accent-ink);
 }
 
 /* ===========================================================================

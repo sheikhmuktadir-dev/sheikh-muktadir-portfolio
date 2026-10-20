@@ -39,8 +39,11 @@ const ArrowIcon = () => (
 export default function CtaButton() {
   const { label, href, download } = site.cta;
 
-  // `download` also hints the saved filename; a bare attribute is enough here.
-  const fileProps = download ? { download: "" } : {};
+  // `download` is the saved filename when it is a string; `true` falls back
+  // to the bare attribute (browser uses the URL's filename).
+  const fileProps = download
+    ? { download: typeof download === "string" ? download : "" }
+    : {};
 
   // Wrapped in .cta-group so hovering EITHER the label or the icon box animates
   // both together — otherwise they react independently and read as two separate

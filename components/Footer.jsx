@@ -15,7 +15,7 @@ export default function Footer() {
 
   const links = [
     ...site.nav,
-    { label: site.cta.label, href: site.cta.href },
+    { label: site.cta.label, href: site.cta.href, download: site.cta.download },
   ];
 
   return (
@@ -41,7 +41,18 @@ export default function Footer() {
               <ul className="footer__links">
                 {links.map((link) => (
                   <li key={link.label}>
-                    <a className="footer__link" href={link.href}>
+                    <a
+                      className="footer__link"
+                      href={link.href}
+                      {...(link.download
+                        ? {
+                            download:
+                              typeof link.download === "string"
+                                ? link.download
+                                : "",
+                          }
+                        : {})}
+                    >
                       <span>{link.label}</span>
                       <span aria-hidden="true">{link.label}</span>
                     </a>

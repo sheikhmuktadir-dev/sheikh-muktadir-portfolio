@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { site } from "@/data/site";
 import { INTRO_MS } from "@/lib/config";
+import { subscribeScroll } from "@/lib/scroll";
+import { openProject } from "@/lib/projectModal";
 
 import Hero from "./Hero";
 import Statement from "./Statement";
@@ -69,29 +71,55 @@ export default function PhoneTrack() {
   // re-rendering the tree on every scroll event.
 
   useEffect(() => {
+    // Viewport-only values (CSS padding of the sticky wrapper, the stage's own
+    // height) only change on resize, so they are cached per viewport size
+    // instead of being re-read — and forcing a style pass — on every frame.
+    let cacheW = -1;
+    let cacheH = -1;
+    let bannerTop = 0;
+    let stageH = 0;
+
+    // Runs in the same frame Lenis moves the page (lib/scroll.js). Ordered as
+    // READ everything -> compute -> WRITE everything, so a frame costs at most
+    // one layout pass instead of one per style write.
     const measure = () => {
       const vh = window.innerHeight;
       const vw = window.innerWidth;
       const middle = vh / 2;
+      const isPhone = vw <= 767.98;
+      const stage = stageRef.current;
+      const tilt = tiltRef.current;
+      const tags = tagsRef.current;
+      const stmt = statementRef.current;
+
+      /* ------------------------------------------------------------ READ */
+      if (stage && (vw !== cacheW || vh !== cacheH)) {
+        cacheW = vw;
+        cacheH = vh;
+        bannerTop = parseFloat(getComputedStyle(stage.parentElement).paddingTop) || 0;
+        stageH = stage.getBoundingClientRect().height;
+      }
+      const y = window.scrollY;
+      const stmtRect = stmt ? stmt.getBoundingClientRect() : null;
+      const nodes = blockRefs.current.filter(Boolean);
+      const rects = nodes.map((n) => n.getBoundingClientRect());
+
+      /* --------------------------------------------------------- COMPUTE */
       // On phones the banner stacks, so the phone sits centred rather than
       // pushed to the side — no horizontal shift.
-      const bannerShift = vw <= 767.98 ? 0 : BANNER_SHIFT;
+      const bannerShift = isPhone ? 0 : BANNER_SHIFT;
 
       // Progress along the sequence:
       //   0    banner
       //   0.5  statement centred
       //   1    statement + button fully passed  -> LOCKED from here on
-      const stmt = statementRef.current;
+      // The end anchor is the BUTTON, not the first case study: everything
+      // finishes here and then holds, so the phone is locked in place and the
+      // case studies travel to it rather than it moving to them.
       let p = 0;
-      if (stmt) {
-        const r = stmt.getBoundingClientRect();
-        const y = window.scrollY;
-        // 0.5 = statement centred, 1 = statement (and its button) fully passed.
-        // The end anchor is the BUTTON, not the first case study: everything
-        // finishes here and then holds, so the phone is locked in place and
-        // the case studies travel to it rather than it moving to them.
-        const centreAt = r.top + y + r.height / 2 - vh / 2;
-        const lockAt = r.bottom + y;
+      if (stmtRect) {
+        const centreAt = stmtRect.top + y + stmtRect.height / 2 - vh / 2;
+        const lockAt = stmtRect.bottom + y;
         p =
           y <= centreAt
             ? 0.5 * (y / Math.max(1, centreAt))
@@ -99,80 +127,36 @@ export default function PhoneTrack() {
         p = Math.min(1, Math.max(0, p));
       }
 
-      // --- banner pills belong to the banner only ---
-      // The tech pills read as part of the banner, so they fade out as the
-      // phone leaves it — gone well before the statement centres (p = 0.5),
-      // rather than lingering over "Static designs bore me…". Written straight
-      // to the element (like the transform) so a throttled tab can't strand
-      // them half-shown. They stay mounted while active < 0, so scrolling back
-      // up to the banner brings them back.
-      const tags = tagsRef.current;
-      if (tags) {
-        const fade = Math.min(1, Math.max(0, (p - 0.05) / 0.2)); // 0.05 → 0.25
-        tags.style.opacity = (1 - fade).toFixed(3);
-        tags.style.transform = `translateY(${(-18 * fade).toFixed(1)}px)`;
-      }
+      // Banner pills fade out as the phone leaves the banner (0.05 -> 0.25),
+      // well before the statement centres.
+      const fade = Math.min(1, Math.max(0, (p - 0.05) / 0.2));
 
-      // --- tilt ---
-      // Reaches upright exactly at the lock point (the button), then holds.
-      // No tilt on phones — the banner is a straight, full-width image there.
-      const deg = (vw <= 767.98 ? 0 : BANNER_TILT) * (1 - p);
+      // Tilt reaches upright exactly at the lock point, then holds. No tilt on
+      // phones — the banner is a straight, full-width image there.
+      const deg = (isPhone ? 0 : BANNER_TILT) * (1 - p);
 
-      // --- vertical drift ---
-      // The phone's viewport position is NOT a straight line from banner to
-      // case studies. Measured off the reference it goes 17% -> 50% -> 8%:
-      // it drops down to clear the statement text, then rises to sit high for
-      // the case studies. Interpolating straight from one end to the other
-      // barely moves it (a 730px phone in a 1080 viewport has only ~350px of
-      // slack), which leaves it sitting on top of the statement.
-      const stage = stageRef.current;
-      if (stage) {
-        const bannerTop = parseFloat(
-          getComputedStyle(stage.parentElement).paddingTop
-        );
-        const lerp = (a, b, t) => a + (b - a) * t;
-        // Banner top is a fixed pixel value; statement/locked stay as vh
-        // fractions. Interpolate the on-screen TOP in px, then subtract the
-        // sticky padding to get the transform offset.
-        const stageH = stage.getBoundingClientRect().height;
-        const topPx =
-          p < 0.5
-            ? lerp(bannerTopPx(vh, stageH), TOP_STATEMENT * vh, p / 0.5)
-            : lerp(TOP_STATEMENT * vh, TOP_LOCKED * vh, (p - 0.5) / 0.5);
-        const drift = topPx - bannerTop;
+      // Vertical drift is NOT a straight line: measured off the reference it
+      // goes 17% -> 50% -> 8% of the viewport — it drops to clear the
+      // statement text, then rises to sit high for the case studies.
+      const lerp = (a, b, t) => a + (b - a) * t;
+      const topPx =
+        p < 0.5
+          ? lerp(bannerTopPx(vh, stageH), TOP_STATEMENT * vh, p / 0.5)
+          : lerp(TOP_STATEMENT * vh, TOP_LOCKED * vh, (p - 0.5) / 0.5);
+      const drift = topPx - bannerTop;
 
-        // --- 3D pass ---
-        // The travel from banner to button is the one long move on the page,
-        // so it gets depth rather than a flat slide: the phone starts turned
-        // away and tipped back, then swings round to face the viewer and
-        // settles flat exactly at the lock. Eased out so most of the rotation
-        // happens early and the last stretch is a gentle settle.
-        const e = 1 - Math.pow(1 - p, 3);
-        const rotY = START_ROT_Y * (1 - e);
-        const rotX = START_ROT_X * (1 - e);
-        const scale = START_SCALE + (1 - START_SCALE) * e;
+      // Eased so most of the settle happens early (axes are zeroed, see the
+      // constants, but the curve still shapes the tilt unwind).
+      const e = 1 - Math.pow(1 - p, 3);
+      const rotY = START_ROT_Y * (1 - e);
+      const rotX = START_ROT_X * (1 - e);
+      const scale = START_SCALE + (1 - START_SCALE) * e;
+      const shift = bannerShift * (1 - p);
 
-        // Split deliberately: the stage only moves, the inner wrapper does the
-        // 3D. Anything on the stage (pills, stat cards) would otherwise be
-        // foreshortened along with the device and render ~30% small.
-        const shift = bannerShift * (1 - p);
-        stage.style.transform =
-          `translateX(${shift.toFixed(1)}px) translateY(${drift.toFixed(1)}px)`;
-
-        const tilt = tiltRef.current;
-        if (tilt) {
-          tilt.style.transform =
-            `perspective(${PERSPECTIVE}px) ` +
-            `rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) ` +
-            `rotate(${deg.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
-        }
-      }
-
-      // --- which case study owns the view (-1 = still in the banner) ---
-      const nodes = blockRefs.current.filter(Boolean);
+      // Which case study owns the view (-1 = still in the banner).
       let next = -1;
-      for (let i = 0; i < nodes.length; i += 1) {
-        const { top, bottom } = nodes[i].getBoundingClientRect();
+      for (let i = 0; i < rects.length; i += 1) {
+        const { top, bottom } = rects[i];
         if (top <= middle && bottom > middle) {
           next = i;
           break;
@@ -180,22 +164,32 @@ export default function PhoneTrack() {
         if (bottom <= middle) next = i;
       }
 
-      // On phones the shared phone fades out once a project owns the view —
-      // each project shows its own inline cover instead, so nothing overlaps.
-      if (stageRef.current) {
-        stageRef.current.style.opacity = vw <= 767.98 && next >= 0 ? "0" : "1";
+      /* ----------------------------------------------------------- WRITE */
+      if (tags) {
+        tags.style.opacity = (1 - fade).toFixed(3);
+        tags.style.transform = `translate3d(0, ${(-18 * fade).toFixed(1)}px, 0)`;
+      }
+      if (stage) {
+        // Split deliberately: the stage only moves, the inner wrapper does the
+        // tilt — anything on the stage (pills, stat cards) would otherwise be
+        // foreshortened along with the device.
+        stage.style.transform =
+          `translate3d(${shift.toFixed(1)}px, ${drift.toFixed(1)}px, 0)`;
+        // On phones the shared phone fades out once a project owns the view —
+        // each project shows its own inline cover instead.
+        stage.style.opacity = isPhone && next >= 0 ? "0" : "1";
+      }
+      if (tilt) {
+        tilt.style.transform =
+          `perspective(${PERSPECTIVE}px) ` +
+          `rotateX(${rotX.toFixed(2)}deg) rotateY(${rotY.toFixed(2)}deg) ` +
+          `rotate(${deg.toFixed(2)}deg) scale(${scale.toFixed(4)})`;
       }
 
       setActive((prev) => (prev === next ? prev : next));
     };
 
-    measure();
-    window.addEventListener("scroll", measure, { passive: true });
-    window.addEventListener("resize", measure);
-    return () => {
-      window.removeEventListener("scroll", measure);
-      window.removeEventListener("resize", measure);
-    };
+    return subscribeScroll(measure);
   }, []);
 
   // Guard the index: if `active` ever points past the end of work (e.g. the
@@ -225,11 +219,13 @@ export default function PhoneTrack() {
             {/* The whole device is a link once a project owns the view. The
                 phone layer is pointer-events:none, so this re-enables it. */}
             {!inBanner && (
-              <a
+              <button
+                type="button"
                 className="phone-link"
-                href={current.href}
-                aria-label={"View " + current.title}
+                aria-label={"Preview " + current.title}
+                aria-haspopup="dialog"
                 data-cursor="View"
+                onClick={(e) => openProject(active, e.currentTarget)}
               />
             )}
             <div className="phone-3d" ref={tiltRef}>

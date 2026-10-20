@@ -1,0 +1,478 @@
+/* ===========================================================================
+   PROJECT MODAL — gallery + details, opened from any project trigger.
+   See components/ProjectModal.jsx.
+
+   z-index 115: above the nav (100) and mobile menu (110), BELOW the fx layer
+   (118) and custom cursor (120) so the cursor's "View" pill still works over
+   the modal. The theme button (130) steps aside via html.pm-open.
+   =========================================================================== */
+
+.pm {
+  position: fixed;
+  inset: 0;
+  z-index: 115;
+  display: grid;
+  place-items: center;
+  padding: clamp(12px, 3vw, 40px);
+  background: rgba(14, 14, 16, 0.58);
+  backdrop-filter: blur(10px) saturate(120%);
+}
+
+html.pm-open .tp {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* --- Panel ----------------------------------------------------------------- */
+.pm__panel {
+  position: relative;
+  width: min(1120px, 100%);
+  height: min(760px, calc(100dvh - 2 * clamp(12px, 3vw, 40px)));
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  overflow: hidden;
+  border-radius: 28px;
+  background: var(--bg-2);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.6) inset,
+    0 30px 80px -20px rgba(0, 0, 0, 0.45),
+    0 12px 30px -12px rgba(0, 0, 0, 0.3);
+}
+
+.pm__close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 5;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--bg-2);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  box-shadow: 0 4px 14px -6px rgba(0, 0, 0, 0.25);
+  transition: transform 0.45s var(--ease-out), background 0.3s var(--ease-out),
+    color 0.3s var(--ease-out);
+}
+.pm__close svg { width: 20px; height: 20px; }
+.pm__close:hover {
+  transform: rotate(90deg);
+  background: var(--ink);
+  color: var(--bg-2);
+}
+
+/* --- Gallery stage ---------------------------------------------------------- */
+.pm__stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 40px 72px 28px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 1px 1px, var(--line) 1px, transparent 1.5px) 0 0 / 22px 22px,
+    var(--bg);
+}
+
+/* Soft accent light behind the device. */
+.pm__glow {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  width: 70%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--accent) 22%, transparent) 0%,
+    transparent 65%
+  );
+  filter: blur(10px);
+  pointer-events: none;
+}
+
+.pm__device {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0; /* its image is absolutely placed, so it would shrink to nothing */
+  height: clamp(300px, calc(min(760px, 100dvh) - 230px), 560px);
+  aspect-ratio: 0.462 / 1;
+  padding: 9px;
+  border-radius: 40px;
+  background: #121214;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset,
+    0 2px 0 rgba(255, 255, 255, 0.08) inset,
+    0 40px 70px -30px rgba(0, 0, 0, 0.55),
+    0 18px 30px -18px rgba(0, 0, 0, 0.4);
+}
+
+.pm__notch {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  z-index: 3;
+  width: 30%;
+  height: 18px;
+  translate: -50% 0;
+  border-radius: 999px;
+  background: #121214;
+}
+
+/* The screenshots start at the app header, so the screen gets a status-bar
+   strip of its own (--pm-bar) for the notch to sit in, instead of covering
+   the app's header icons. */
+.pm__screen {
+  --pm-bar: 34px;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 31px;
+  background: #fff;
+}
+
+.pm__shot {
+  position: absolute;
+  top: var(--pm-bar);
+  left: 0;
+  width: 100%;
+  height: calc(100% - var(--pm-bar));
+  object-fit: cover;
+  object-position: top center;
+  user-select: none;
+  cursor: grab;
+  touch-action: pan-y;
+}
+.pm__shot:active { cursor: grabbing; }
+
+/* Prev / next */
+.pm__nav {
+  position: absolute;
+  top: 44%;
+  z-index: 2;
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  translate: 0 -50%;
+  border-radius: 50%;
+  background: var(--bg-2);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  box-shadow: 0 8px 20px -10px rgba(0, 0, 0, 0.35);
+  transition: transform 0.4s var(--ease-out), background 0.3s var(--ease-out),
+    color 0.3s var(--ease-out);
+}
+.pm__nav svg { width: 20px; height: 20px; }
+.pm__nav--prev { left: 18px; }
+.pm__nav--prev svg { transform: rotate(180deg); }
+.pm__nav--next { right: 18px; }
+.pm__nav:hover {
+  background: var(--ink);
+  color: var(--bg-2);
+  transform: scale(1.08);
+}
+
+/* Thumbs + counter */
+.pm__strip {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.pm__thumbs {
+  display: flex;
+  gap: 10px;
+}
+
+.pm__thumb {
+  position: relative;
+  width: 38px;
+  aspect-ratio: 0.462 / 1;
+  border-radius: 9px;
+  opacity: 0.5;
+  transition: opacity 0.3s var(--ease-out), transform 0.4s var(--ease-out);
+}
+.pm__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  border-radius: inherit;
+  box-shadow: 0 0 0 1px var(--line);
+}
+.pm__thumb:hover { opacity: 0.85; transform: translateY(-2px); }
+.pm__thumb[data-active="true"] { opacity: 1; }
+
+.pm__thumb-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 12px;
+  border: 2px solid var(--accent);
+  pointer-events: none;
+}
+
+.pm__counter {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.pm__counter-sep { color: var(--ink-mute); }
+.pm__counter-label {
+  margin-left: 8px;
+  color: var(--ink-soft);
+}
+
+/* --- Details --------------------------------------------------------------- */
+.pm__info {
+  display: flex;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: clamp(32px, 4.5vw, 64px) clamp(28px, 4vw, 56px);
+  scrollbar-width: none;
+}
+.pm__info::-webkit-scrollbar { display: none; }
+
+.pm__info-inner {
+  margin: auto 0;
+  width: 100%;
+}
+
+.pm__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.pm__square {
+  width: 8px;
+  height: 8px;
+  background: var(--accent-ink, var(--ink));
+}
+.pm__dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--ink-mute);
+}
+
+.pm__title {
+  margin: 18px 0 18px;
+  font-family: var(--font-grotesk);
+  font-weight: var(--wght-display);
+  font-size: clamp(2.2rem, 3.4vw, 3.5rem);
+  letter-spacing: -0.04em;
+  line-height: 0.98;
+  color: var(--accent-ink, var(--ink));
+}
+
+.pm__desc {
+  max-width: 46ch;
+  color: var(--ink-soft);
+  font-size: var(--step-0);
+  line-height: 1.6;
+}
+
+.pm__stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 28px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.pm__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  transition: transform 0.4s var(--ease-out), border-color 0.3s var(--ease-out);
+}
+.pm__stat:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+.pm__stat-value {
+  font-family: var(--font-grotesk);
+  font-weight: var(--wght-display);
+  font-size: 1.45rem;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: var(--ink);
+}
+.pm__stat-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+
+.pm__cats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+}
+.pm__cat {
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.pm__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 18px;
+  margin-top: 30px;
+}
+
+/* Primary action — solid, with a light sweep on hover. */
+.pm__live {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 52px;
+  padding: 0 24px;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: 12px;
+  background: var(--accent-ink, var(--ink));
+  color: #fff;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  box-shadow: 0 10px 24px -12px color-mix(in srgb, var(--accent-ink, var(--ink)) 70%, transparent);
+  transition: transform 0.45s var(--ease-out), box-shadow 0.45s var(--ease-out);
+}
+.pm__live svg {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.45s var(--ease-out);
+}
+.pm__live::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.22) 50%,
+    transparent 70%
+  );
+  transform: translateX(-120%);
+  transition: transform 0.8s var(--ease-out);
+}
+.pm__live:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 32px -14px color-mix(in srgb, var(--accent-ink, var(--ink)) 80%, transparent);
+}
+.pm__live:hover svg { transform: translate(3px, -3px); }
+.pm__live:hover::after { transform: translateX(120%); }
+
+.pm__host {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+}
+.pm__host--muted { color: var(--ink-mute); text-transform: uppercase; letter-spacing: 0.12em; }
+
+.pm__pulse {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #16a34a;
+}
+.pm__pulse::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #16a34a;
+  animation: pm-ping 1.8s var(--ease-out) infinite;
+}
+@keyframes pm-ping {
+  0% { transform: scale(1); opacity: 0.6; }
+  80%, 100% { transform: scale(2.6); opacity: 0; }
+}
+
+/* --- Phones & small tablets: bottom sheet ------------------------------------ */
+@media (max-width: 859.98px) {
+  .pm {
+    padding: 0;
+    place-items: end stretch;
+  }
+  .pm__panel {
+    width: 100%;
+    height: min(94dvh, 100%);
+    /* A scrolling sheet, not a grid: a fixed-height grid squeezes the gallery
+       row to fit, collapsing the device frame. */
+    display: block;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border-radius: 24px 24px 0 0;
+    scrollbar-width: none;
+  }
+  .pm__panel::-webkit-scrollbar { display: none; }
+
+  .pm__close { top: 12px; right: 12px; width: 40px; height: 40px; }
+
+  .pm__stage { padding: 56px 56px 22px; }
+  .pm__device {
+    height: clamp(300px, 56dvh, 480px);
+    border-radius: 34px;
+    padding: 7px;
+  }
+  .pm__screen { border-radius: 27px; --pm-bar: 28px; }
+  .pm__notch { top: 13px; height: 15px; }
+  .pm__nav { width: 40px; height: 40px; }
+  .pm__nav--prev { left: 10px; }
+  .pm__nav--next { right: 10px; }
+
+  .pm__info { overflow: visible; padding: 28px 22px 40px; }
+  .pm__title { font-size: clamp(2rem, 9vw, 2.6rem); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pm__pulse::after { animation: none; }
+  .pm__live::after { display: none; }
+}

@@ -11,7 +11,10 @@ import { site } from "@/data/site";
 
 // Applies the saved theme to <html> BEFORE first paint, so a reload never
 // flashes the default palette before React hydrates. Kept tiny and inline.
-const themeBootstrap = `(function(){try{var a=localStorage.getItem('pf-accent')||'mono';var m=localStorage.getItem('pf-mode')||'light';document.documentElement.setAttribute('data-theme',m==='dark'?a+'-dark':a);}catch(e){}})();`;
+// Light themes only (dark mode removed 2026-10-21). Ids must match
+// components/ThemePicker.jsx ACCENTS; anything else stored from the old
+// system (violet/rose/gold, pf-mode) falls back to the default.
+const themeBootstrap = `(function(){try{var ok={mono:1,blue:1,green:1,orange:1};var a=localStorage.getItem('pf-accent');if(!ok[a])a='mono';document.documentElement.setAttribute('data-theme',a);localStorage.removeItem('pf-mode');}catch(e){}})();`;
 
 // Fonts are self-hosted from ./fonts rather than fetched via next/font/google.
 // The Google loader downloads the woff2 files at BUILD time, and that fetch is
@@ -60,8 +63,32 @@ const bigShoulders = localFont({
 });
 
 export const metadata = {
+  // Absolute base for canonical / Open Graph URLs (LinkedIn / WhatsApp link
+  // previews). Override with NEXT_PUBLIC_SITE_URL if the domain changes.
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "https://sheikh-muktadir-portfolio-nu.vercel.app"
+  ),
   title: `${site.name} — ${site.role} · React, Next.js & React Native · Hyderabad`,
   description: site.intro,
+  keywords: [
+    "Front-End Developer Hyderabad",
+    "React Developer Hyderabad",
+    "Next.js Developer",
+    "React Native Developer",
+    "Immediate Joiner",
+    site.name,
+  ],
+  authors: [{ name: site.name }],
+  robots: { index: true, follow: true },
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    url: "/",
+    title: `${site.name} — ${site.role}`,
+    description: site.intro,
+    siteName: site.name,
+    locale: "en_IN",
+  },
 };
 
 export const viewport = {

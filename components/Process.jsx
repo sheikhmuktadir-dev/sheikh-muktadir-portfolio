@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { site } from "@/data/site";
+import { subscribeScroll } from "@/lib/scroll";
 import { Reveal } from "./Reveal";
 
 /**
@@ -40,13 +41,9 @@ export default function Process() {
       setActive((prev) => (prev === next ? prev : next));
     };
 
-    measure();
-    window.addEventListener("scroll", measure, { passive: true });
-    window.addEventListener("resize", measure);
-    return () => {
-      window.removeEventListener("scroll", measure);
-      window.removeEventListener("resize", measure);
-    };
+    // Same-frame as Lenis (lib/scroll.js); read-only, so it never forces a
+    // second layout pass.
+    return subscribeScroll(measure);
   }, []);
 
   const { label, heading, intro, steps } = site.process;

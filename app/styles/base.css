@@ -73,6 +73,26 @@
 
 html { -webkit-text-size-adjust: 100%; }
 
+/* Lenis base rules (from lenis/dist/lenis.css). Native smooth scrolling must
+   be off while Lenis drives the page, or the two easings fight and the scroll
+   stutters; [data-lenis-prevent] regions keep their own scroll. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
 body {
   margin: 0;
   background: var(--dark);

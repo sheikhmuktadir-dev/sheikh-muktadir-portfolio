@@ -1,125 +1,65 @@
 /* ===========================================================================
-   THEME — multi-palette system.
+   THEME — multi-palette system (LIGHT ONLY).
 
    The whole app is token-driven (every colour routes through --bg / --ink /
    --dark / --line …), so a theme is nothing more than a re-declaration of those
    tokens under an attribute on <html>.
 
-   Axes
-     accent :  mono (default) · violet · rose · gold
-     mode   :  light · dark
-   combined into a single data-theme value: "<accent>" (light) or
-   "<accent>-dark". "mono" light is the base :root design, so it needs no block.
+   Axis
+     accent : mono (default) · blue · green · orange
+   `data-theme="<accent>"`. "mono" is the base :root design in base.css, so it
+   needs no block here.
 
-   How the colour reads (matches the default's restraint): the design is paper +
-   near-black charcoal, so a colour theme keeps that editorial calm — it does NOT
-   flood every headline and paragraph with a hue. Instead:
-     --ink       a DEEP tinted charcoal — reads near-black, with the hue only as
-                 an undertone, so text stays legible and the page never becomes a
-                 wall of one loud colour (the old themes' mistake).
-     --bg        paper with a whisper of tint; --bg-2 stays clean white for cards.
-     --accent    the one true pop of colour — the FAB glow, link/cursor accents.
-                 Kept vivid because it appears in only a few, deliberate places.
-     inverted    footer / contact tint their ground (--dark) with the hue and set
-                 near-white tinted text (--dark-fg) — premium, not neon.
-   Dark themes follow the same rule: near-black ground, tinted near-white ink,
-   vivid accent for the few pops. This reads professional and on-brand without the
-   page turning monochromatically purple/rose/gold.
+   DARK MODE WAS REMOVED on 2026-10-21 at the client's request ("dark not suits
+   this"). Don't re-add "<accent>-dark" blocks, the Light/Dark toggle, or the
+   dark-only icon-chip rule in sections.css.
+
+   How the colour reads ("coloured display type, neutral body"):
+     --ink         a DEEP tinted charcoal — body copy reads near-black, with the
+                   hue only as an undertone, so the page never becomes a wall of
+                   one loud colour.
+     --bg          paper with a whisper of tint; --bg-2 stays clean white.
+     --accent      the one true pop — FAB glow, link/cursor accents.
+     --accent-ink  the exact swatch hex, applied ONLY to the display type
+                   (wordmark, hero headline, project titles, marker squares) by
+                   the scoped rule at the bottom. RULE: swatch dot colour and
+                   headline colour must stay identical — retune both together.
+     inverted      footer / contact tint their ground (--dark) with the hue and
+                   set near-white tinted text (--dark-fg).
+
+   Palette (2026-10-21, "professional and good"): corporate hues at the depth
+   you'd see on a bank or consultancy site — NOT the earlier violet/rose/gold.
+     blue   #1d4ed8  royal blue   — trust, the safest recruiter-facing colour
+     green  #15803d  forest green — calm, growth
+     orange #c2410c  burnt orange — warm, energetic, still grown-up
 
    Applied before paint by the inline script in layout.js (no flash), toggled at
-   runtime by <ThemePicker>.
+   runtime by <ThemePicker>. Old stored ids (violet/rose/gold, "-dark") have no
+   block → graceful fallback to mono.
    =========================================================================== */
 
-/* Shared dark-ground dot artwork: transparent-ish rect + white dots, screened
-   faintly over the dark surface so the texture survives without lightening the
-   whole block the way the light overlay tile would. */
-:root[data-theme$="-dark"] {
-  --dot-tile: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Crect width='96' height='96' fill='%23000000'/%3E%3Cg fill='%23ffffff'%3E%3Ccircle cx='24' cy='24' r='4'/%3E%3Ccircle cx='72' cy='24' r='4'/%3E%3Ccircle cx='24' cy='72' r='4'/%3E%3Ccircle cx='72' cy='72' r='4'/%3E%3C/g%3E%3C/svg%3E");
-  --dot-blend: screen;
-  --dot-opacity: 0.1;
+:root[data-theme="blue"] {
+  --bg: #eef3fb;  --bg-2: #ffffff;
+  --ink: #141a2b;  --ink-soft: #5f6678;  --ink-mute: #979db0;
+  --line: rgba(29, 78, 216, 0.16);  --line-soft: rgba(29, 78, 216, 0.08);
+  --dark: #0f1a33;  --dark-fg: #e9eef9;
+  --accent: #1d4ed8;  --accent-ink: #1d4ed8;
 }
 
-/* ---------------------------------------------------------------------------
-   LIGHT · colour accents (paper ground, coloured ink)
-   --------------------------------------------------------------------------- */
-
-/* Accents (the one true pop of colour): violet #7c5cff · rose #f43f5e ·
-   gold #cf9a2e. Text (--ink) is NOT the accent — it is a deep charcoal carrying
-   only a faint undertone of the hue, so headlines and body read near-black and
-   the page keeps the default's editorial calm. --ink-soft / --ink-mute stay
-   near-neutral. The colour shows in the paper tint, the accent pops and the
-   inverted blocks — never as a wall of coloured text. */
-
-:root[data-theme="violet"] {
-  --bg: #f2eefb;  --bg-2: #ffffff;
-  --ink: #221b30;  --ink-soft: #676274;  --ink-mute: #9c98a8;
-  --line: rgba(124, 92, 255, 0.16);  --line-soft: rgba(124, 92, 255, 0.08);
-  --dark: #16111f;  --dark-fg: #ece9f6;
-  --accent: #7c5cff;  --accent-ink: #7c5cff;
+:root[data-theme="green"] {
+  --bg: #eef6f0;  --bg-2: #ffffff;
+  --ink: #14201a;  --ink-soft: #5c6a62;  --ink-mute: #93a099;
+  --line: rgba(21, 128, 61, 0.18);  --line-soft: rgba(21, 128, 61, 0.09);
+  --dark: #0e1f16;  --dark-fg: #e6f2ea;
+  --accent: #15803d;  --accent-ink: #15803d;
 }
 
-:root[data-theme="rose"] {
-  --bg: #fbeff1;  --bg-2: #ffffff;
-  --ink: #2a161a;  --ink-soft: #6d6165;  --ink-mute: #a89a9d;
-  --line: rgba(244, 63, 94, 0.15);  --line-soft: rgba(244, 63, 94, 0.08);
-  --dark: #1e1013;  --dark-fg: #f6ebed;
-  --accent: #f43f5e;  --accent-ink: #f43f5e;
-}
-
-:root[data-theme="gold"] {
-  --bg: #f8f2e4;  --bg-2: #ffffff;
-  --ink: #262012;  --ink-soft: #67614f;  --ink-mute: #a29a86;
-  --line: rgba(191, 138, 30, 0.24);  --line-soft: rgba(191, 138, 30, 0.11);
-  --dark: #1a1408;  --dark-fg: #f4eedd;
-  --accent: #cf9a2e;  --accent-ink: #cf9a2e;
-}
-
-/* ---------------------------------------------------------------------------
-   DARK · neutral + colour accents (dark ground, bright ink)
-   --------------------------------------------------------------------------- */
-
-/* Recipe for a premium dark ground: a deep, near-black canvas carrying only a
-   whisper of the accent hue (never a saturated tint — that reads muddy), with a
-   clearly-raised --bg-2 so cards/panels have real elevation. --ink-soft /
-   --ink-mute are kept mostly neutral (a faint accent warmth) so secondary text
-   stays crisp and the page doesn't drown in one hue. */
-
-:root[data-theme="mono-dark"] {
-  --bg: #0b0b0d;  --bg-2: #17171b;
-  --ink: #f5f5f6;  --ink-soft: #adadb3;  --ink-mute: #6c6c74;
-  --line: rgba(245, 245, 245, 0.13);  --line-soft: rgba(245, 245, 245, 0.06);
-  --dark: #141418;  --dark-fg: #f5f5f6;
-  --accent: #f5f5f6;  --accent-ink: #f5f5f6;
-}
-
-/* Dark colour themes: a deep, near-black canvas carrying only a whisper of the
-   hue (never a saturated tint — that reads muddy), a clearly-raised --bg-2 for
-   real card elevation, and TINTED NEAR-WHITE ink (not neon coloured text — that
-   read cheap). The hue lives in the accent pops and the faint ground warmth;
-   --ink-soft / --ink-mute stay near-neutral so secondary text stays crisp. */
-
-:root[data-theme="violet-dark"] {
-  --bg: #0c0a12;  --bg-2: #16131e;
-  --ink: #ece9f5;  --ink-soft: #a5a1b2;  --ink-mute: #6d6a7b;
-  --line: rgba(124, 92, 255, 0.22);  --line-soft: rgba(124, 92, 255, 0.11);
-  --dark: #131120;  --dark-fg: #ece9f5;
-  --accent: #8f7bff;  --accent-ink: #7c5cff;
-}
-
-:root[data-theme="rose-dark"] {
-  --bg: #110a0c;  --bg-2: #1d1418;
-  --ink: #f4e9eb;  --ink-soft: #afa1a4;  --ink-mute: #766769;
-  --line: rgba(244, 63, 94, 0.22);  --line-soft: rgba(244, 63, 94, 0.11);
-  --dark: #190f12;  --dark-fg: #f4e9eb;
-  --accent: #ff6076;  --accent-ink: #f43f5e;
-}
-
-:root[data-theme="gold-dark"] {
-  --bg: #0f0c06;  --bg-2: #1a1610;
-  --ink: #f2ecdd;  --ink-soft: #a9a18f;  --ink-mute: #736c5b;
-  --line: rgba(207, 154, 46, 0.24);  --line-soft: rgba(207, 154, 46, 0.12);
-  --dark: #161107;  --dark-fg: #f2ecdd;
-  --accent: #e3b246;  --accent-ink: #cf9a2e;
+:root[data-theme="orange"] {
+  --bg: #fbf1ea;  --bg-2: #ffffff;
+  --ink: #261a12;  --ink-soft: #6b5f57;  --ink-mute: #a6998f;
+  --line: rgba(194, 65, 12, 0.18);  --line-soft: rgba(194, 65, 12, 0.09);
+  --dark: #22140c;  --dark-fg: #f6ece6;
+  --accent: #c2410c;  --accent-ink: #c2410c;
 }
 
 /* ---------------------------------------------------------------------------
@@ -127,11 +67,9 @@
 
    The default (mono, no colour) is excluded, so it is untouched. For every
    colour theme the big display elements — wordmark, hero headline, project
-   titles and the marker squares — take --accent-ink (a rich, readable shade of
-   the accent). Body copy, descriptions and pills stay neutral --ink, so the
-   colour is clearly visible on the type that carries the brand without the page
-   becoming a wall of one hue. This is the "coloured headlines, neutral body"
-   pattern — visible and professional at once.
+   titles and the marker squares — take --accent-ink. Body copy, descriptions
+   and pills stay neutral --ink, so the colour is clearly visible on the type
+   that carries the brand without the page becoming a wall of one hue.
    --------------------------------------------------------------------------- */
 :root[data-theme]:not([data-theme="mono"]) .nav__brand,
 :root[data-theme]:not([data-theme="mono"]) .hero__headline,
@@ -147,8 +85,8 @@
 /* ===========================================================================
    FLOATING THEME PICKER
    A fixed FAB (bottom-right, reachable from any section) that opens a small
-   panel of accent swatches + a light/dark toggle. Sits in the app z-ladder at
-   130 — above the nav (100) and cursor (120), below the intro preloader (200).
+   panel of accent swatches. Sits in the app z-ladder at 130 — above the nav
+   (100) and cursor (120), below the intro preloader (200).
    =========================================================================== */
 
 .tp {
@@ -239,12 +177,11 @@
   margin-bottom: 12px;
 }
 
-/* Swatch row */
+/* Swatch row — the whole panel now, so no trailing margin. */
 .tp-swatches {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 10px;
-  margin-bottom: 16px;
 }
 
 .tp-swatch {
@@ -275,47 +212,6 @@
   border-width: 0 2px 2px 0;
   transform: translate(-50%, -50%) rotate(45deg);
 }
-
-/* Light / dark segmented toggle */
-.tp-mode {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  padding: 3px;
-  border-radius: 10px;
-  background: var(--bg);
-  border: 1px solid var(--line);
-}
-.tp-mode__thumb {
-  position: absolute;
-  top: 3px;
-  bottom: 3px;
-  left: 3px;
-  width: calc(50% - 3px);
-  border-radius: 8px;
-  background: var(--ink);
-  transition: transform 0.4s var(--ease-io);
-  z-index: 0;
-}
-.tp-mode[data-mode="dark"] .tp-mode__thumb { transform: translateX(100%); }
-.tp-mode__opt {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  height: 32px;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.4px;
-  text-transform: uppercase;
-  color: var(--ink-soft);
-  cursor: pointer;
-  transition: color 0.4s var(--ease-out);
-}
-.tp-mode__opt[data-on="true"] { color: var(--bg-2); }
-.tp-mode__opt svg { width: 14px; height: 14px; }
 
 @media (prefers-reduced-motion: reduce) {
   .tp-fab::after { animation: none; }

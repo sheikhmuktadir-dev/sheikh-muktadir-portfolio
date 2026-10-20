@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
+import { subscribeScroll } from "@/lib/scroll";
 
 /**
  * Two-part cursor: a dot that tracks 1:1 and a ring that lags on a spring.
@@ -42,12 +43,19 @@ export default function Cursor() {
     // the ring rather than lingering after the cursor has left the window.
     let shown = false;
 
+    // Page progress straight from the scroll position — no getComputedStyle
+    // read-back (that forced a full style pass on every scroll frame).
+    let progress = 0;
+    let maxScroll = 1;
+    const readProgress = (scrollY) => {
+      maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      progress = Math.min(1, Math.max(0, scrollY / maxScroll));
+    };
+
     const paintProgress = () => {
       progRaf = 0;
       if (!prog || !arc) return;
-      const p = parseFloat(
-        getComputedStyle(document.documentElement).getPropertyValue("--fx-progress")
-      ) || 0;
+      const p = progress;
       arc.style.strokeDasharray = `${CIRC}`;
       arc.style.strokeDashoffset = `${CIRC * (1 - p)}`;
       // The arc only earns its place once the visitor is actually moving down
@@ -56,13 +64,8 @@ export default function Cursor() {
       prog.classList.toggle("is-on", p > 0.01 && shown);
     };
 
-    const onProgScroll = () => {
-      if (!progRaf) progRaf = requestAnimationFrame(paintProgress);
-    };
-
+    readProgress(window.scrollY);
     paintProgress();
-    window.addEventListener("scroll", onProgScroll, { passive: true });
-    window.addEventListener("resize", onProgScroll);
 
     // Last known pointer position, kept in a ref-like local so the scroll
     // handler can re-test what is under the cursor without an event.
@@ -95,11 +98,22 @@ export default function Cursor() {
     // The pointer can sit still while content moves beneath it — scrolling,
     // the case-study swap, the sticky phone. No pointerover fires, so without
     // this the ring stays enlarged and labelled after the element has gone.
-    const onScroll = () => {
+    // Hit-testing forces layout, so it runs at most once per frame, after the
+    // scroll-linked writes for that frame have landed.
+    let hitRaf = 0;
+    const hitTest = () => {
+      hitRaf = 0;
       if (!shown) return;
       const el = document.elementFromPoint(pos.x, pos.y);
       applyHit(el?.closest?.("[data-cursor], a, button") || null);
     };
+
+    // One subscription drives both the arc and the hover re-test.
+    const unsubscribe = subscribeScroll((scrollY) => {
+      readProgress(scrollY);
+      if (!progRaf) progRaf = requestAnimationFrame(paintProgress);
+      if (shown && !hitRaf) hitRaf = requestAnimationFrame(hitTest);
+    });
 
     // Reset everything on the way out, or the cursor returns mid-hover.
     const reset = () => {
@@ -111,17 +125,15 @@ export default function Cursor() {
 
     window.addEventListener("pointermove", onMove, { passive: true });
     window.addEventListener("pointerover", onOver, { passive: true });
-    window.addEventListener("scroll", onScroll, { passive: true });
     document.documentElement.addEventListener("pointerleave", reset);
     window.addEventListener("blur", reset);
 
     return () => {
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerover", onOver);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("scroll", onProgScroll);
-      window.removeEventListener("resize", onProgScroll);
+      unsubscribe();
       cancelAnimationFrame(progRaf);
+      cancelAnimationFrame(hitRaf);
       document.documentElement.removeEventListener("pointerleave", reset);
       window.removeEventListener("blur", reset);
     };

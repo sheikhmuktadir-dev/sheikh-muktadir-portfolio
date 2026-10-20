@@ -9,10 +9,10 @@ const fullName = "Sheikh Muktadir";
 
 export const site = {
   name: fullName,
-  role: "Full-Stack Developer",
+  role: "Front-End Developer",
   location: "Hyderabad, IN",
   timezone: "Asia/Kolkata",
-  email: "you@example.com",
+  email: "sheikhmuktadir.dev@gmail.com",
 
   // The oversized condensed word bleeding off the bottom of the banner.
   // Derived from your first name; set a string here to override it instead.
@@ -24,13 +24,13 @@ export const site = {
   // availability — together they read as a developer openly looking for a job.
   // Widths are kept close (~499 / ~531px at the top breakpoint) so the block
   // still stacks evenly. Keep any replacement near that width, under ~780px.
-  headline: ["Full-stack developer", "open to full-time work"],
+  headline: ["Front-end developer", "open to full-time work"],
 
   // Short paragraph under the headline — the "why hire me" line. No filler
   // adjectives: years, stack, and the cities a recruiter filters on. Keep it
   // near ~106 characters so it holds three lines in the narrow column.
   intro:
-    "4 years shipping React, Next.js, React Native and Node.js apps end to end — Hyderabad, Bangalore or remote.",
+    "4+ years turning Figma into fast, pixel-perfect React, Next.js and React Native apps — based in Hyderabad.",
 
   // Image shown inside the sticky phone. Put a file in /public and point here,
   // e.g. "/hero.jpg". Leave empty for the placeholder.
@@ -44,16 +44,23 @@ export const site = {
   // Keep each one at or under ~16 characters so the pills stay the same
   // compact size as the reference ("React & Next.js" was the longest before).
   heroTags: [
-    "4 Yrs Experience",
-    "React & Next.js",
-    "Full-Stack Lead",
+    "4+ Yrs Front-End",
     "Pixel-Perfect UI",
+    "Immediate Joiner",
+    "React & Next.js",
   ],
 
   // Primary action in the header. Drop your PDF at public/cv.pdf, or point
   // href anywhere. Setting download:true adds the download attribute so the
   // browser saves the file instead of opening it in a tab.
-  cta: { label: "Download CV", href: "/cv.pdf", download: true },
+  // `download` is the filename the browser saves it as. The PDF itself is
+  // generated from these same facts — regenerate it whenever the copy here
+  // changes so the site and the CV never disagree.
+  cta: {
+    label: "Download CV",
+    href: "/cv.pdf",
+    download: "Sheikh-Muktadir-Front-End-Developer-CV.pdf",
+  },
 
   // Big statement block below the hero. First person, creative-developer
   // voice — motion and craft up front, performance as the ground note, closing
@@ -63,22 +70,7 @@ export const site = {
   // length just needs to stay in that ballpark — much shorter and a line goes
   // thin, much longer and it spills to a fifth line.
   statement:
-    "Give me a Figma file and a deadline — you get a pixel-exact web or mobile app that loads fast and ships on time. Four years in, and ready for the next team.",
-
-  about: {
-    heading: "Studio",
-    body: [
-      "I'm a full-stack developer with a front-end heart — the layer where design decisions become something you can actually touch.",
-      "Most of my work lives in the details: how a menu opens, how type settles into place, how a page holds together at every width.",
-      "Currently open to selected freelance and collaboration.",
-    ],
-    facts: [
-      { label: "Experience", value: "4 years" },
-      { label: "Focus", value: "Interface & motion" },
-      { label: "Availability", value: "Open to work" },
-      { label: "Based in", value: "Hyderabad" },
-    ],
-  },
+    "Give me a Figma file and a deadline — I'll ship a pixel-exact, fast front end in React, Next.js or React Native, on time. 4+ years of proof. Ready for my next team.",
 
   // About & Experience — a pinned numeral that rolls as each entry takes the
   // view. Step 01 is about me; 02–04 are previous roles.
@@ -88,77 +80,77 @@ export const site = {
     label: "About me",
     heading: "A bit about me and where I've worked",
     intro:
-      "Four years building full-stack apps in React, Next.js, React Native and Node.js. Here's who I am and the teams I've done it with.",
+      "4+ years building fast, pixel-exact front ends in React, Next.js and React Native. Here's who I am and the teams I've done it with.",
     steps: [
       {
         title: "About me",
-        duration: "Full-Stack Developer & Team Lead",
+        duration: "Front-End Developer & Team Lead",
         items: [
           {
             label: "Who I am",
-            body: "A full-stack developer who takes products from Figma to production — web and mobile, for ed-tech, healthcare and e-commerce — and keeps them fast once they are live.",
+            body: "A B.Tech CSE graduate (2020) and front-end developer who takes products from Figma to production — web in React and Next.js, mobile in React Native.",
           },
           {
             label: "My stack",
-            body: "React, Next.js and React Native on the front, Node.js, Express and MongoDB on the back — Redux Toolkit for state, Tailwind, Framer Motion and WordPress to finish.",
+            body: "React, Next.js and React Native at the core — Redux Toolkit for state, Tailwind and Bootstrap for layout, WordPress for content sites. Figma in, pixel-exact UI out.",
           },
           {
             label: "Right now",
-            body: "Leading web and mobile at SMCloudMyle and looking for my next full-time role — a product team that treats speed, quality and ownership as non-negotiable.",
+            body: "Leading web and mobile at SMCloudMyle and ready for my next full-time front-end role in Hyderabad — immediate joiner, no notice period to serve.",
           },
         ],
       },
       {
         title: "SMCloudMyle LLP",
-        duration: "May 2026 — Present · Full-Stack Developer & Team Lead",
+        duration: "May 2026 — Present · Front-End Developer & Team Lead",
         items: [
           {
             label: "Lead",
-            body: "Lead development across web and mobile — I own the architecture, set the standards, and push the team to ship fast without breaking quality.",
+            body: "Lead the front end across web and mobile — I own the component architecture, set the UI standards, and keep the team shipping fast without breaking quality.",
           },
           {
             label: "Build",
-            body: "Leading the build of ChessCurve — a live chess-coaching platform with real-time boards, video, chat, homework and in-browser Stockfish analysis in Next.js and Node.js.",
+            body: "Leading ChessCurve's front end — a live chess-coaching platform with real-time boards, video, chat, homework and Stockfish analysis, built in Next.js from Figma.",
           },
           {
             label: "Performance",
-            body: "Engineer for speed — high-90s Lighthouse on the web and steady 60fps interactions in React Native, measured, not guessed.",
+            body: "Engineer for speed — Stockfish 18 running in the browser, board moves synced live over Socket.IO, and screens that stay smooth with video and chat open.",
           },
         ],
       },
       {
         title: "Bizionic Technologies",
-        duration: "Jul 2024 — Jan 2026 · Front-end Developer",
+        duration: "Jul 2024 — Jan 2026 · Front-End Developer",
         items: [
           {
             label: "Built",
-            body: "Shipped customer-facing web apps in React and Next.js — new features and full pages taken from design to production, on time.",
+            body: "Shipped customer-facing web apps in React and Next.js for a year and a half — new features and full pages taken from Figma to production, on time.",
           },
           {
             label: "Components",
-            body: "Built a shared component library and patterns that cut delivery time and kept the whole product visually consistent.",
+            body: "Built the shared component library the team worked from — one set of buttons, forms and layouts, so every page looked and behaved the same.",
           },
           {
             label: "Quality",
-            body: "Owned performance and accessibility — fast loads, near-zero layout shift, and interfaces that held up at every screen size.",
+            body: "Owned the front end end to end — fast loads, layouts that held at every screen size, and problems caught before clients ever saw them.",
           },
         ],
       },
       {
-        title: "ZAPS Marketing",
-        duration: "Sep 2022 — May 2024 · Front-end Developer",
+        title: "ZAPS Group",
+        duration: "Sep 2022 — May 2024 · Front-End Developer",
         items: [
           {
             label: "Built",
-            body: "Turned Figma designs into clean, responsive websites and web apps in React and JavaScript — shipped straight to production.",
+            body: "Turned Figma designs into clean, responsive websites and web apps in React and JavaScript — shipped straight to production for real clients on real deadlines.",
           },
           {
             label: "WordPress",
-            body: "Built custom WordPress themes and Bootstrap layouts the content team could run and update without a developer.",
+            body: "Built custom WordPress themes and Bootstrap layouts the content team could run and update on their own — no developer needed for a new page.",
           },
           {
             label: "Growth",
-            body: "Grew fast under real deadlines — from first tickets to owning full pages and features end to end.",
+            body: "Joined as a fresher and within months was trusted with whole pages unsupervised — from first tickets to owning features end to end.",
           },
         ],
       },
@@ -167,10 +159,10 @@ export const site = {
 
   // Tech grid. `icon` is the filename slug of a real logo in /public/icons/
   // (official brand SVGs), rendered as a 3D sticker tile in components/Brands.jsx.
-  // 12 tiles = 6x2. Row 1 is the front-end a recruiter screens for, row 2 is
-  // the MERN back end plus the motion/CSS tools that set the work apart.
-  // No baseline tools (HTML, Git): nobody hires for them and they dilute the
-  // grid. Only list what you can defend in an interview.
+  // 12 tiles = 6x2. Row 1 is the front-end framework stack a recruiter screens
+  // for, row 2 is the foundation + styling/motion/CMS tools. FRONT-END ONLY —
+  // no Node/Express/MongoDB: this is a front-end portfolio and every tile must
+  // survive an interview question. No TypeScript/GraphQL/Sass either.
   brandsLabel: "Tech I work with",
   brands: [
     { name: "React", icon: "react" },
@@ -179,53 +171,49 @@ export const site = {
     { name: "JavaScript", icon: "javascript" },
     { name: "Redux Toolkit", icon: "redux" },
     { name: "Tailwind", icon: "tailwind" },
-    { name: "Node.js", icon: "nodejs" },
-    { name: "Express", icon: "express" },
-    { name: "MongoDB", icon: "mongodb" },
-    { name: "Framer Motion", icon: "framer" },
+    { name: "HTML5", icon: "html5" },
+    { name: "CSS3", icon: "css3" },
     { name: "Bootstrap", icon: "bootstrap" },
+    { name: "Figma", icon: "figma" },
     { name: "WordPress", icon: "wordpress" },
-  ],
-
-  services: [
-    {
-      title: "Interface Design",
-      body: "Layout, type systems and component libraries built to scale without losing character.",
-    },
-    {
-      title: "Motion",
-      body: "Scroll choreography, page transitions and micro-interactions that carry meaning, not noise.",
-    },
-    {
-      title: "Front-end",
-      body: "React and Next.js builds — accessible, responsive, and fast on the devices people actually use.",
-    },
+    { name: "Git", icon: "git" },
   ],
 
   // ---------------------------------------------------------------------------
-  // Case studies. Drop images into /public/work/ and point `image` at them.
-  // Leave `image` empty and a tinted card stands in for it.
+  // Projects. ChessCurve and ActivPower IRx are real (and are the CV's Key
+  // Projects in cv/cv-data.mjs). Fitness Tracking App and E-commerce
+  // Storefront are DEMO placeholders the owner will replace with real projects
+  // — keep them, and add each real one to the CV too when it lands.
   // ---------------------------------------------------------------------------
-  // Case studies. The sticky phone swaps its media as each one scrolls in.
-  // Drop images in /public/work/ and point  at them.
-  // Projects. The sticky phone swaps its media as each one scrolls in, and
-  // links to href. `categories` is the stack you used, not a service label.
+  // The sticky phone swaps its media as each one scrolls in.
+  // Clicking the phone, the cover or "View project" opens the preview modal
+  // (components/ProjectModal.jsx): `gallery` screens + a "Visit live site"
+  // button for http(s) `href`s. `categories` is the stack you used.
   work: [
     {
       title: "ChessCurve",
       year: "2026",
       description:
-        "A live chess-coaching platform. Coach and students share a real-time board with video, chat, homework and Stockfish 18 analysis running in the browser. I built the whole front end in Next.js on a Node.js and Socket.IO backend — from Figma to production.",
-      image: "/media/portavia-project-1.jpeg",
-      href: "#",
+        "A live chess-coaching platform. Coach and students share a real-time board with video, chat, homework and Stockfish 18 analysis running in the browser. I lead the front end — every screen built in Next.js from Figma, synced live over Socket.IO.",
+      // Real coach Sessions dashboard at phone width (692x1500 webp,
+      // 2026-10-21; sidebar shadow + scrollbar cleaned out). Chosen over the
+      // empty-state chat screen: it shows the product working.
+      image: "/media/chesscurve-sessions-mobile.webp",
+      // Screens shown in the preview modal (phone-shaped, ~0.46 ratio). First
+      // one should match `image`. Add more real screens here as you get them.
+      gallery: [
+        { src: "/media/chesscurve-sessions-mobile.webp", label: "Coach sessions" },
+        { src: "/media/gallery/chesscurve-chat.webp", label: "Group chat" },
+      ],
+      href: "https://classroom.chesscurve.com/",
       tint: "#ededed",
       stats: [
         { value: "Live", label: "In production" },
         { value: "Real-time", label: "Board sync" },
-        { value: "3", label: "User roles" },
+        { value: "3", label: "Portals" },
         { value: "SF18", label: "Engine in-browser" },
       ],
-      categories: ["Next.js", "Socket.IO", "Node.js"],
+      categories: ["Next.js", "React", "Socket.IO"],
     },
     {
       title: "Fitness Tracking App",
@@ -260,85 +248,43 @@ export const site = {
       categories: ["React", "JavaScript ES6", "Tailwind"],
     },
     {
-      title: "Custom WordPress Site",
+      title: "ActivPower IRx",
+      // Built at ZAPS Group (Sep 2022 – May 2024).
       year: "2024",
       description:
-        "A content site on a custom theme with editor blocks the team could actually use. Rebuilt the front end so editors publish pages themselves — no developer needed — and every page loads in under a second.",
-      image: "/media/portavia-project-4.jpeg",
-      href: "#",
+        "An online supplements store on WordPress. I rebuilt the storefront, product pages and checkout from static designs into the live theme — mobile-first, pixel-exact, every cart and subscription hook still working. Shipped for IRx and its sister brand, Canis.",
+      // Real phone-size capture of the live home page (1080x2340 webp, 2026-10-21).
+      image: "/media/activpower-irx-mobile.webp",
+      gallery: [
+        { src: "/media/activpower-irx-mobile.webp", label: "Home" },
+        { src: "/media/gallery/activpower-shop.webp", label: "Shop · Human products" },
+      ],
+      href: "https://activpowerirx.com/",
       tint: "#ededed",
+      // Facts only: page count and product count are from the site build.
       stats: [
-        { value: "95", label: "Lighthouse" },
-        { value: "-70%", label: "Page weight" },
-        { value: "14", label: "Editor blocks" },
-        { value: "0.9s", label: "LCP" },
+        { value: "Live", label: "Online store" },
+        { value: "14", label: "Pages built" },
+        { value: "8", label: "Products" },
+        { value: "2", label: "Brand sites" },
       ],
-      categories: ["WordPress", "JavaScript ES6", "Bootstrap"],
-    },
-  ],
-
-  // ---------------------------------------------------------------------------
-  // Testimonials carousel (td-noise style). RULE: every quote must be words the
-  // named person actually said or approved — these are real people a recruiter
-  // may call. No invented percentages in stats; only facts (tenure, scope).
-  // `image` is optional — leave it empty and a tinted initials card stands in.
-  // ---------------------------------------------------------------------------
-  testimonialsLabel: "Testimonials",
-  testimonials: [
-    {
-      quote:
-        "Sheikh ran our front-end for a year and a half. He asked the questions others missed, caught problems before clients did, and his pages just worked. I'd hire him again.",
-      name: "Mohd Hussaini",
-      role: "CEO · Bizionic Technologies",
-      // Photo file kept at /media/mohd-hussaini-ceo.webp — restore this path
-      // once he has said yes to it being on the site.
-      image: "",
-      rating: 5,
-      stats: [
-        { value: "18 mo", label: "Worked together" },
-        { value: "Front-end", label: "Owned end to end" },
-      ],
-    },
-    {
-      quote:
-        "He joined as a fresher, and within months I was handing him whole pages without checking behind him. Quick learner, and he cared that the work was right, not just done.",
-      name: "Md Usman",
-      role: "Manager · ZAPS Marketing",
-      // Photo file kept at /media/mdusman.jpg — restore this path once he has
-      // said yes to it being on the site.
-      image: "",
-      rating: 5,
-      stats: [
-        { value: "20 mo", label: "Worked together" },
-        { value: "WordPress", label: "and React sites" },
-      ],
-    },
-    {
-      quote:
-        "We gave Sheikh rough ideas and got back a working product. The live board, video, chat — he kept at the hard real-time parts until they actually felt right.",
-      name: "Mr. Chandra",
-      role: "Client · ChessCurve",
-      image: "",
-      rating: 5,
-      stats: [
-        { value: "Live", label: "In production" },
-        { value: "Real-time", label: "Board, video, chat" },
-      ],
+      categories: ["WordPress", "JavaScript", "CSS3"],
     },
   ],
 
   // Footer "Get in touch" blurb — the last thing a recruiter reads before the
-  // email link. Must agree with the hero: same role (full-stack), same
+  // email link. Must agree with the hero: same role (front-end), same
   // availability. Same length as the original so the column wraps the same.
   footerLead:
-    "Available now for full-time full-stack roles across web and mobile. If you're hiring, let's talk.",
+    "Hiring a front-end developer in Hyderabad? I can join immediately — React, Next.js and React Native. Let's talk.",
 
   socials: [
-    { label: "Email", href: "mailto:you@example.com" },
-    { label: "GitHub", href: "https://github.com/" },
-    { label: "LinkedIn", href: "https://linkedin.com/" },
-    // Replace the number with your own (international format, no + or spaces).
-    { label: "WhatsApp", href: "https://wa.me/1234567890" },
+    { label: "Email", href: "mailto:sheikhmuktadir.dev@gmail.com" },
+    { label: "GitHub", href: "https://github.com/sheikhmuktadir-dev/" },
+    { label: "LinkedIn", href: "https://www.linkedin.com/in/sheikhmuktadir-dev/" },
+    // WhatsApp removed 2026-10-21 (no number supplied). To add it back:
+    // { label: "WhatsApp", href: "https://wa.me/91XXXXXXXXXX" } — international
+    // format, no + or spaces.
   ],
 
   nav: [

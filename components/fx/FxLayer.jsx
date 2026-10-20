@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { subscribeScroll } from "@/lib/scroll";
 
 /**
  * The page-wide effects layer. One fixed, pointer-events:none surface that
@@ -14,14 +15,24 @@ import { useEffect, useRef } from "react";
  *                   dark footer, without ever painting a visible blob.
  *   2. Burst      — a ring + sparks fired from every click. Drawn in
  *                   `difference` so it reads on light AND dark surfaces.
- *   3. Broadcast  — publishes `--fx-vel` (scroll speed, 0–1) and
- *                   `--fx-progress` (page progress, 0–1) on <html>, which the
- *                   rest of the stylesheet reads: the RGB split on the giant
- *                   wordmarks, the glare across the phone, the dot drift.
+ *   3. Broadcast  — publishes `--fx-vel` (scroll speed, 0–1) to the elements
+ *                   that read it: the RGB split on the giant wordmarks and the
+ *                   glare across the phone.
+ *
+ * PERFORMANCE (2026-10-21): `--fx-vel` used to be written on <html> every
+ * scroll frame. A custom property on the root is inherited by every element,
+ * so each write invalidated style for the WHOLE document — the biggest single
+ * cost on the page. It is now written only to the consumer elements, and only
+ * while they are on screen. The old `--fx-progress` / dot-grid drift is gone
+ * (it repainted a full-viewport blended layer every frame for ~3% of motion).
  *
  * Everything here is transform/opacity only and lives on its own layer, so it
  * cannot cause layout shift or a horizontal scrollbar at any width.
  */
+
+// Elements that read --fx-vel. Keep in sync with fx.css.
+const VEL_TARGETS = ".wordmark, .phone";
+
 export default function FxLayer() {
   const layerRef = useRef(null);
   const sheenRef = useRef(null);
@@ -29,7 +40,6 @@ export default function FxLayer() {
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
     const layer = layerRef.current;
-    const root = document.documentElement;
 
     /* ---------------------------------------------------------------- sheen */
     // Fine pointers only: on touch there is no cursor to follow, and the
@@ -46,6 +56,23 @@ export default function FxLayer() {
       let cy = ty;
       let seen = false;
 
+      // Lerped rather than pinned to the cursor — the lag is what makes it
+      // read as light spilling behind the pointer instead of a sticker. The
+      // loop runs only while the light is still catching up, then sleeps;
+      // the next pointermove wakes it.
+      const loop = () => {
+        cx += (tx - cx) * 0.11;
+        cy += (ty - cy) * 0.11;
+        sheen.style.transform = `translate3d(${cx.toFixed(1)}px, ${cy.toFixed(
+          1
+        )}px, 0) translate(-50%, -50%)`;
+        if (Math.abs(tx - cx) > 0.3 || Math.abs(ty - cy) > 0.3) {
+          raf = requestAnimationFrame(loop);
+        } else {
+          raf = 0;
+        }
+      };
+
       const onMove = (event) => {
         tx = event.clientX;
         ty = event.clientY;
@@ -53,17 +80,7 @@ export default function FxLayer() {
           seen = true;
           sheen.style.opacity = "1";
         }
-      };
-
-      // Lerped rather than pinned to the cursor — the lag is what makes it
-      // read as light spilling behind the pointer instead of a sticker.
-      const loop = () => {
-        cx += (tx - cx) * 0.11;
-        cy += (ty - cy) * 0.11;
-        sheen.style.transform = `translate3d(${cx.toFixed(1)}px, ${cy.toFixed(
-          1
-        )}px, 0) translate(-50%, -50%)`;
-        raf = requestAnimationFrame(loop);
+        if (!raf) raf = requestAnimationFrame(loop);
       };
 
       const hide = () => {
@@ -71,7 +88,6 @@ export default function FxLayer() {
         sheen.style.opacity = "0";
       };
 
-      raf = requestAnimationFrame(loop);
       window.addEventListener("pointermove", onMove, { passive: true });
       document.documentElement.addEventListener("pointerleave", hide);
       window.addEventListener("blur", hide);
@@ -135,60 +151,76 @@ export default function FxLayer() {
     window.addEventListener("pointerdown", onDown, { passive: true });
 
     /* ------------------------------------------------------------ broadcast */
+    // Only on-screen consumers get the variable; off-screen ones would cost a
+    // style pass for nothing. They are reset to 0 as they leave, so they come
+    // back at rest.
+    const visible = new Set();
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            visible.add(entry.target);
+          } else {
+            visible.delete(entry.target);
+            entry.target.style.removeProperty("--fx-vel");
+          }
+        }
+      },
+      { rootMargin: "120px 0px" }
+    );
+    document.querySelectorAll(VEL_TARGETS).forEach((el) => io.observe(el));
+
+    const write = (value) => {
+      visible.forEach((el) => el.style.setProperty("--fx-vel", value));
+    };
+
     let last = window.scrollY;
     let vel = 0;
     let velRaf = 0;
-    let queued = false;
+    let lastWritten = "0";
 
     const settle = () => {
-      queued = false;
       // Decay toward rest so the value eases back down instead of snapping
       // to 0 the moment the wheel stops.
       vel *= 0.86;
-      root.style.setProperty("--fx-vel", vel.toFixed(3));
       if (vel > 0.002) {
+        const v = vel.toFixed(2);
+        if (v !== lastWritten) {
+          lastWritten = v;
+          write(v);
+        }
         velRaf = requestAnimationFrame(settle);
       } else {
         vel = 0;
-        root.style.setProperty("--fx-vel", "0");
+        velRaf = 0;
+        if (lastWritten !== "0") {
+          lastWritten = "0";
+          write("0");
+        }
       }
     };
 
-    const onScroll = () => {
-      const y = window.scrollY;
+    const unsubscribe = subscribeScroll((y) => {
       const delta = Math.abs(y - last);
       last = y;
-
+      if (reduced.matches) return;
       // ~90px of travel in one frame is full intensity. Capped at 1 so the
       // effects it drives can never run away on a flung trackpad.
       vel = Math.min(1, Math.max(vel, delta / 90));
-
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      root.style.setProperty(
-        "--fx-progress",
-        max > 0 ? (y / max).toFixed(4) : "0"
-      );
-
-      if (!queued && !reduced.matches) {
-        queued = true;
-        velRaf = requestAnimationFrame(settle);
-      }
-    };
-
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+      if (!velRaf) velRaf = requestAnimationFrame(settle);
+    });
 
     return () => {
       teardownSheen?.();
       cancelAnimationFrame(velRaf);
+      unsubscribe();
+      io.disconnect();
       window.removeEventListener("pointerdown", onDown);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
       live.forEach((node) => node.remove());
       live.clear();
-      root.style.removeProperty("--fx-vel");
-      root.style.removeProperty("--fx-progress");
+      document
+        .querySelectorAll(VEL_TARGETS)
+        .forEach((el) => el.style.removeProperty("--fx-vel"));
     };
   }, []);
 

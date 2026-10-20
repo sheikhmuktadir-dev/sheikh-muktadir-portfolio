@@ -32,11 +32,11 @@ Runs on [http://localhost:3007](http://localhost:3007).
 
 ```
 app/          App Router entry (layout, page, styles)
-components/   UI sections (Hero, Process, Testimonials, …)
+components/   UI sections (Hero, Process, CaseStudyBlocks, Contact, …)
 components/fx/  Animation layer (cursor, preloader, counters, sheen)
 data/site.js  Single source of truth for all site content
 lib/          Helpers
-public/       Static assets (icons, media, work)
+public/       Static assets (icons, media)
 ```
 
 Content is data-driven — edit `data/site.js` to change copy, projects, and links

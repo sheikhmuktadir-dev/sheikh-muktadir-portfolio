@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { site } from "@/data/site";
 import Counter from "./fx/Counter";
 import Scramble from "./fx/Scramble";
+import { openProject } from "@/lib/projectModal";
 
 const EASE = [0.22, 1, 0.36, 1];
 
@@ -60,7 +61,11 @@ export default function CaseStudyBlocks({ blockRefs }) {
             <div className="cs__cover" aria-hidden="true">
               {/* Slim portrait media (td-noise proportion). Clips its own
                   corners; the stat cards live outside it so they can overhang. */}
-              <div className="cs__cover-media">
+              <div
+                className="cs__cover-media"
+                data-cursor="View"
+                onClick={(e) => openProject(i, e.currentTarget)}
+              >
                 {item.image ? <img src={item.image} alt="" loading="lazy" /> : null}
               </div>
 
@@ -88,7 +93,15 @@ export default function CaseStudyBlocks({ blockRefs }) {
               <span className="cs__year">{item.year}</span>
               <h3 className="cs__title">{item.title}</h3>
               <p className="cs__desc">{item.description}</p>
-              <a className="cs__link fx-underline" href={item.href} data-cursor="View">
+              {/* Opens the preview modal (gallery + "Visit live site"), so the
+                  recruiter never leaves the portfolio by accident. */}
+              <button
+                type="button"
+                className="cs__link fx-underline"
+                data-cursor="View"
+                aria-haspopup="dialog"
+                onClick={(e) => openProject(i, e.currentTarget)}
+              >
                 View project
                 <svg width="20" height="12" viewBox="0 0 20 12" fill="none" aria-hidden="true">
                   <path
@@ -99,7 +112,7 @@ export default function CaseStudyBlocks({ blockRefs }) {
                     strokeLinejoin="round"
                   />
                 </svg>
-              </a>
+              </button>
             </div>
 
             <div className="cs__cats">

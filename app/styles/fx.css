@@ -179,12 +179,9 @@
   text-shadow: 10px 0 rgba(255, 58, 96, 0.55), -10px 0 rgba(0, 176, 255, 0.5);
 }
 
-/* --- Dot grid parallax ----------------------------------------------------
-   Moves the TEXTURE, not the element: translating the tile would drag its
-   bottom edge up and leave a bare strip at the end of the panel. */
-.dot-tile {
-  background-position: 50% calc(var(--fx-progress, 0) * -260px);
-}
+/* (Dot-grid parallax removed 2026-10-21: it animated background-position on a
+   full-height overlay-blended layer, repainting the whole viewport on every
+   scroll frame for ~3% of visible motion.) */
 
 /* --- Phone glare ----------------------------------------------------------
    A slow diagonal light travelling across the device, brightening with scroll
@@ -207,18 +204,23 @@
     rgba(255, 255, 255, 0.1) 55%,
     rgba(255, 255, 255, 0) 100%
   );
-  transform: rotate(18deg);
+  transform: translate3d(0, 0, 0) rotate(18deg);
   opacity: calc(0.35 + var(--fx-vel, 0) * 0.65);
+  /* Travels by TRANSFORM, not `left`: animating `left` re-ran layout and
+     repainted the phone on every frame, forever, even with the page at rest.
+     Distance = 330% of the phone (-140% -> 190%) = 366.67% of this band's own
+     90% width, which is what translateX percentages are measured against. */
   animation: fx-glare 7s var(--ease-io) infinite;
+  will-change: transform;
 }
 
 @keyframes fx-glare {
   0%,
   62% {
-    left: -140%;
+    transform: translate3d(0, 0, 0) rotate(18deg);
   }
   100% {
-    left: 190%;
+    transform: translate3d(366.67%, 0, 0) rotate(18deg);
   }
 }
 

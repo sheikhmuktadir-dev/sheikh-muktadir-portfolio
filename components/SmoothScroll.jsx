@@ -2,10 +2,15 @@
 
 import { useEffect } from "react";
 import Lenis from "lenis";
+import { emitScroll, setLenis } from "@/lib/scroll";
 
 /**
  * Wraps the app in Lenis smooth scrolling.
  * Bails out entirely when the visitor prefers reduced motion.
+ *
+ * Every scroll-linked effect subscribes through lib/scroll.js, and Lenis
+ * drives that channel from inside its own frame (see the note there), so the
+ * sticky phone, cursor arc and wordmark split move in lockstep with the page.
  */
 export default function SmoothScroll({ children }) {
   useEffect(() => {
@@ -20,8 +25,14 @@ export default function SmoothScroll({ children }) {
       duration: 1.15,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
+      // Touch keeps the device's native momentum — it is already smooth, and
+      // re-easing it on phones feels laggy. Lenis still reports those scrolls.
       touchMultiplier: 1.6,
     });
+
+    // Same-frame broadcast to every scroll subscriber.
+    lenis.on("scroll", emitScroll);
+    setLenis(lenis);
 
     let frame = requestAnimationFrame(function loop(time) {
       lenis.raf(time);
@@ -45,6 +56,8 @@ export default function SmoothScroll({ children }) {
     return () => {
       cancelAnimationFrame(frame);
       document.removeEventListener("click", onAnchorClick);
+      lenis.off("scroll", emitScroll);
+      setLenis(null);
       lenis.destroy();
     };
   }, []);

@@ -14,13 +14,27 @@
   display: grid;
   place-items: center;
   padding: clamp(12px, 3vw, 40px);
-  background: rgba(14, 14, 16, 0.58);
-  backdrop-filter: blur(10px) saturate(120%);
+  /* A plain scrim, no backdrop-filter: blurring the whole viewport has to be
+     redone every frame of the fade (and whenever anything behind animates),
+     which is what made the open stutter. */
+  background: rgba(14, 14, 16, 0.66);
 }
+
+/* The scroll lock hides the page scrollbar; keep its gutter so the page
+   underneath doesn't widen, re-lay out and jump sideways as the modal opens. */
+html.pm-open { scrollbar-gutter: stable; }
 
 html.pm-open .tp {
   visibility: hidden;
   pointer-events: none;
+}
+
+/* Hold the page's looping animations while the modal covers it — phones
+   would otherwise keep compositing them under the sheet every frame. */
+html.pm-open .tp-fab,
+html.pm-open .cs__cover-stat,
+html.pm-open .brands__track {
+  animation-play-state: paused;
 }
 
 /* --- Panel ----------------------------------------------------------------- */
@@ -33,6 +47,8 @@ html.pm-open .tp {
   overflow: hidden;
   border-radius: 28px;
   background: var(--bg-2);
+  /* Own layer: the open/close scale is composited, not repainted per frame. */
+  will-change: transform, opacity;
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.6) inset,
     0 30px 80px -20px rgba(0, 0, 0, 0.45),
@@ -92,7 +108,6 @@ html.pm-open .tp {
     color-mix(in srgb, var(--accent) 22%, transparent) 0%,
     transparent 65%
   );
-  filter: blur(10px);
   pointer-events: none;
 }
 
@@ -136,6 +151,10 @@ html.pm-open .tp {
   border-radius: 31px;
   background: #fff;
 }
+
+/* Screens captured with their own iPhone status bar (gallery `statusBar`)
+   need no extra strip. */
+.pm__screen[data-own-bar] { --pm-bar: 0px; }
 
 .pm__shot {
   position: absolute;
@@ -450,11 +469,24 @@ html.pm-open .tp {
     overflow-y: auto;
     overscroll-behavior: contain;
     border-radius: 24px 24px 0 0;
+    /* One soft edge shadow; the desktop's 80px-blur stack is costly to
+       rasterise on a phone and invisible against the bottom edge anyway. */
+    box-shadow: 0 -10px 30px -12px rgba(0, 0, 0, 0.35);
     scrollbar-width: none;
   }
   .pm__panel::-webkit-scrollbar { display: none; }
 
-  .pm__close { top: 12px; right: 12px; width: 40px; height: 40px; }
+  /* The sheet itself scrolls, so an absolute Close would scroll away with
+     the content. Sticky keeps it pinned to the sheet's top-right corner; the
+     negative bottom margin cancels its in-flow height so nothing moves down. */
+  .pm__close {
+    position: sticky;
+    top: 12px;
+    right: auto;
+    width: 40px;
+    height: 40px;
+    margin: 12px 12px -52px auto;
+  }
 
   .pm__stage { padding: 56px 56px 22px; }
   .pm__device {

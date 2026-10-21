@@ -29,6 +29,23 @@ export default function ProjectModal() {
 
   useEffect(() => setMounted(true), []);
 
+  // Download + decode every project's screens while the page is idle, so the
+  // first open doesn't stall on a network fetch or a big image decode.
+  useEffect(() => {
+    const warm = () =>
+      site.work.forEach((w) =>
+        (w.gallery?.length ? w.gallery : [{ src: w.image }]).forEach((s) => {
+          const img = new Image();
+          img.decoding = "async";
+          img.src = s.src;
+          img.decode?.().catch(() => {});
+        })
+      );
+    const idle = typeof window.requestIdleCallback === "function";
+    const id = idle ? window.requestIdleCallback(warm, { timeout: 4000 }) : setTimeout(warm, 2000);
+    return () => (idle ? window.cancelIdleCallback(id) : clearTimeout(id));
+  }, []);
+
   // Scroll lock follows the OPEN STATE, not a Dialog's lifetime. A closing
   // Dialog stays mounted for its exit animation; if it owned the lock, closing
   // one project and opening another within that half-second would let the old
@@ -62,6 +79,10 @@ function Dialog({ item, index }) {
   const isPresent = useIsPresent();
   const panelRef = useRef(null);
   const closeRef = useRef(null);
+  // Phones get a bottom sheet (modal.css ≤859.98px). It slides up as one
+  // rasterised layer — translate only: a scale makes phones re-raster the
+  // whole tall sheet, and that is what stuttered there.
+  const [sheet] = useState(() => window.matchMedia("(max-width: 859.98px)").matches);
 
   const slides =
     item.gallery && item.gallery.length
@@ -80,17 +101,11 @@ function Dialog({ item, index }) {
   );
   const goTo = (i) => setSlide(([s]) => [i, i > s ? 1 : -1]);
 
-  // Warm the other screens and focus Close.
+  // Focus Close straight away (the node exists once effects run) — not on the
+  // next frame, which a background tab may never deliver. Screens are already
+  // warm (see ProjectModal).
   useEffect(() => {
-    slides.forEach((s) => {
-      const img = new Image();
-      img.src = s.src;
-    });
-    // Focus straight away (the node exists once effects run) — not on the
-    // next frame, which a background tab may never deliver.
     closeRef.current?.focus({ preventScroll: true });
-    // Runs once: `slides` comes from `item`, which is fixed for this Dialog's
-    // whole life (a different project mounts a fresh Dialog via its key).
   }, []);
 
   // Esc closes, arrows page the gallery, Tab stays inside the dialog.
@@ -140,8 +155,8 @@ function Dialog({ item, index }) {
     show: { transition: { staggerChildren: reduce ? 0 : 0.06, delayChildren: dur(0.18) } },
   };
   const rise = {
-    hidden: { opacity: 0, y: reduce ? 0 : 18 },
-    show: { opacity: 1, y: 0, transition: { duration: dur(0.6), ease: EASE } },
+    hidden: { opacity: 0, transform: reduce ? "none" : "translateY(18px)" },
+    show: { opacity: 1, transform: "translateY(0px)", transition: { duration: dur(0.6), ease: EASE } },
   };
 
   return (
@@ -164,10 +179,25 @@ function Dialog({ item, index }) {
         aria-modal="true"
         aria-labelledby={titleId}
         data-lenis-prevent
-        initial={{ opacity: 0, y: reduce ? 0 : 48, scale: reduce ? 1 : 0.97 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: reduce ? 0 : 32, scale: reduce ? 1 : 0.98 }}
-        transition={{ duration: dur(0.55), ease: EASE }}
+        // A full `transform` string (not x / y / scale) runs as a compositor
+        // (WAAPI) animation, so the open stays smooth while React mounts the
+        // dialog and the browser decodes its screenshots on the main thread.
+        initial={
+          sheet
+            ? { transform: reduce ? "none" : "translateY(100%)" }
+            : { opacity: 0, transform: reduce ? "none" : "translateY(48px) scale(0.97)" }
+        }
+        animate={
+          sheet
+            ? { transform: "translateY(0%)" }
+            : { opacity: 1, transform: "translateY(0px) scale(1)" }
+        }
+        exit={
+          sheet
+            ? { transform: reduce ? "none" : "translateY(100%)" }
+            : { opacity: 0, transform: reduce ? "none" : "translateY(32px) scale(0.98)" }
+        }
+        transition={{ duration: dur(sheet ? 0.5 : 0.55), ease: EASE }}
       >
         <button
           ref={closeRef}
@@ -188,13 +218,14 @@ function Dialog({ item, index }) {
 
           <div className="pm__device">
             <span className="pm__notch" aria-hidden="true" />
-            <div className="pm__screen">
+            <div className="pm__screen" data-own-bar={current.statusBar ? "" : undefined}>
               <AnimatePresence initial={false} custom={dir}>
                 <motion.img
                   key={slide}
                   className="pm__shot"
                   src={current.src}
                   alt={`${item.title} — ${current.label}`}
+                  decoding="async"
                   custom={dir}
                   variants={shotVariants}
                   initial="enter"
@@ -251,7 +282,7 @@ function Dialog({ item, index }) {
                     data-cursor
                     onClick={() => goTo(i)}
                   >
-                    <img src={s.src} alt="" loading="lazy" draggable={false} />
+                    <img src={s.src} alt="" decoding="async" draggable={false} />
                     {i === slide ? (
                       <motion.span
                         layoutId="pm-thumb-ring"

@@ -41,6 +41,18 @@ const START_ROT_Y = 0;
 const START_ROT_X = 0;
 const START_SCALE = 1;
 
+// Banner and project pills drift a little as the page scrolls, each at its own rate, so
+// the set loosens instead of moving as one block. Per pill: extra upward
+// speed (fraction of scroll), outward sideways speed (1 & 3 sit left of the
+// phone, 2 & 4 right) and a small tilt reached after PILL_TILT_PX of scroll.
+const PILL_DRIFT = [
+  { up: 0.1, out: -0.03, rot: -3 },
+  { up: 0.05, out: 0.04, rot: 2.5 },
+  { up: 0.14, out: -0.05, rot: 2 },
+  { up: 0.07, out: 0.03, rot: -2.5 },
+];
+const PILL_TILT_PX = 500;
+
 /**
  * One phone for the whole run. It is a single sticky element spanning the
  * banner, the statement and every case study, so it never unmounts — it just
@@ -78,6 +90,7 @@ export default function PhoneTrack() {
     let cacheH = -1;
     let bannerTop = 0;
     let stageH = 0;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
 
     // Runs in the same frame Lenis moves the page (lib/scroll.js). Ordered as
     // READ everything -> compute -> WRITE everything, so a frame costs at most
@@ -127,10 +140,6 @@ export default function PhoneTrack() {
         p = Math.min(1, Math.max(0, p));
       }
 
-      // Banner pills fade out as the phone leaves the banner (0.05 -> 0.25),
-      // well before the statement centres.
-      const fade = Math.min(1, Math.max(0, (p - 0.05) / 0.2));
-
       // Tilt reaches upright exactly at the lock point, then holds. No tilt on
       // phones — the banner is a straight, full-width image there.
       const deg = (isPhone ? 0 : BANNER_TILT) * (1 - p);
@@ -166,8 +175,48 @@ export default function PhoneTrack() {
 
       /* ----------------------------------------------------------- WRITE */
       if (tags) {
-        tags.style.opacity = (1 - fade).toFixed(3);
-        tags.style.transform = `translate3d(0, ${(-18 * fade).toFixed(1)}px, 0)`;
+        // Banner pills don't fade: they stay on the banner and scroll away
+        // with the page, like the case-study stat cards. They ride on the
+        // stage, which drifts and shifts, so cancel that motion and apply the
+        // page scroll instead — page speed from where they sat at the top.
+        const drift0 = bannerTopPx(vh, stageH) - bannerTop;
+        tags.style.transform = `translate3d(${(bannerShift - shift).toFixed(1)}px, ${(
+          drift0 - drift - y
+        ).toFixed(1)}px, 0)`;
+        // The per-pill drift goes on the inner .tag: the outer pill wrapper is
+        // owned by its framer entrance animation.
+        if (!reduced.matches) {
+          const t = Math.min(1, y / PILL_TILT_PX);
+          tags.querySelectorAll(".tag").forEach((pill, i) => {
+            const d = PILL_DRIFT[i % PILL_DRIFT.length];
+            pill.style.transform = `translate3d(${(d.out * y).toFixed(1)}px, ${(
+              -d.up * y
+            ).toFixed(1)}px, 0) rotate(${(d.rot * t).toFixed(2)}deg)`;
+          });
+        }
+      }
+      // Project stat pills get the same drift, measured from the block's
+      // centre instead of the page top: at centre they sit exactly on the
+      // locked phone, and loosen as the block comes in and leaves. Phones show
+      // the inline cover cards instead (.cs__stats is hidden there).
+      if (!isPhone && !reduced.matches) {
+        // Outward = away from the phone: cards alternate sides from 1280px,
+        // below that they all sit on its right (sections.css).
+        const side = vw >= 1280 ? [1, -1, 1, -1] : [1, 1, 1, 1];
+        nodes.forEach((block, b) => {
+          const r = rects[b];
+          if (r.bottom < -vh || r.top > vh * 2) return;
+          const off = r.top + r.height / 2 - middle;
+          const t = Math.max(-1, Math.min(1, off / PILL_TILT_PX));
+          block.querySelectorAll(".cs__stat").forEach((card, i) => {
+            const d = PILL_DRIFT[i % PILL_DRIFT.length];
+            card.style.transform = `translate3d(${(
+              side[i % side.length] * Math.abs(d.out * off)
+            ).toFixed(1)}px, ${(d.up * off).toFixed(1)}px, 0) rotate(${(d.rot * t).toFixed(
+              2
+            )}deg)`;
+          });
+        });
       }
       if (stage) {
         // Split deliberately: the stage only moves, the inner wrapper does the

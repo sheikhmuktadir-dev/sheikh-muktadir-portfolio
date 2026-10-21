@@ -131,8 +131,7 @@
     height: 100%;
     object-fit: cover;
     display: block;
-  }
-  /* Wordmark sits below the image on the light ground, so keep it dark (the
+  }  /* Wordmark sits below the image on the light ground, so keep it dark (the
      base ink colour) — a light wordmark here was unreadable on the pale photo. */
   .hero__wordmark {
     color: var(--ink);
@@ -271,6 +270,10 @@
 .phone-tag {
   position: absolute;
   z-index: 3;
+}
+/* Scroll-linked drift + tilt is written here every frame (PhoneTrack). */
+.phone-tag .tag {
+  will-change: transform;
 }
 
 /* Measured off the reference at 1905x1080: all four left-anchored, on a
@@ -439,6 +442,8 @@
   border-radius: 8px;
   box-shadow: 0 10px 30px rgba(20, 20, 20, 0.13);
   white-space: nowrap;
+  /* Scroll-linked drift + tilt is written here every frame (PhoneTrack). */
+  will-change: transform;
 }
 
 .cs__stat-value {

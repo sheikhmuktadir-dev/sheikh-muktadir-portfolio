@@ -195,15 +195,16 @@ export const site = {
       year: "2026",
       description:
         "A live chess-coaching platform. Coach and students share a real-time board with video, chat, homework and Stockfish 18 analysis running in the browser. I lead the front end — every screen built in Next.js from Figma, synced live over Socket.IO.",
-      // Real coach Sessions dashboard at phone width (692x1500 webp,
-      // 2026-10-21; sidebar shadow + scrollbar cleaned out). Chosen over the
-      // empty-state chat screen: it shows the product working.
-      image: "/media/chesscurve-sessions-mobile.webp",
+      // 3x captures of the local coach app at iPhone size (390x844 → 1170x2532
+      // webp, 2026-10-22), with an iPhone status bar baked in: a real puzzle
+      // submission review (hw 390 "Double Check", replay at the last move;
+      // scrollbar painted out) and the Board Editor on a dark spotlight.
+      image: "/media/chesscurve-review.webp",
       // Screens shown in the preview modal (phone-shaped, ~0.46 ratio). First
       // one should match `image`. Add more real screens here as you get them.
       gallery: [
-        { src: "/media/chesscurve-sessions-mobile.webp", label: "Coach sessions" },
-        { src: "/media/gallery/chesscurve-chat.webp", label: "Group chat" },
+        { src: "/media/chesscurve-review.webp", label: "Puzzle review", statusBar: true },
+        { src: "/media/chesscurve-board-cinematic.webp", label: "Board editor", statusBar: true },
       ],
       href: "https://classroom.chesscurve.com/",
       tint: "#ededed",
@@ -253,11 +254,16 @@ export const site = {
       year: "2024",
       description:
         "An online supplements store on WordPress. I rebuilt the storefront, product pages and checkout from static designs into the live theme — mobile-first, pixel-exact, every cart and subscription hook still working. Shipped for IRx and its sister brand, Canis.",
-      // Real phone-size capture of the live home page (1080x2340 webp, 2026-10-21).
-      image: "/media/activpower-irx-mobile.webp",
+      // Cinematic capture of the live home hero at iPhone size (390x844 @3x →
+      // 1170x2532 webp, 2026-10-22): iPhone status bar on top (so the device
+      // notch clears the header), hero stretched to full screen, intro
+      // paragraph + shipping bar hidden, darker grade.
+      image: "/media/activpower-irx-cinematic.webp",
       gallery: [
-        { src: "/media/activpower-irx-mobile.webp", label: "Home" },
-        { src: "/media/gallery/activpower-shop.webp", label: "Shop · Human products" },
+        { src: "/media/activpower-irx-cinematic.webp", label: "Home", statusBar: true },
+        // Same cinematic treatment on /shop/human/ (status bar, darker banner,
+        // shop section on a dark spotlight).
+        { src: "/media/gallery/activpower-shop-cinematic.webp", label: "Shop · Human products", statusBar: true },
       ],
       href: "https://activpowerirx.com/",
       tint: "#ededed",

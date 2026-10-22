@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react";
 import { site } from "@/data/site";
-import { MaskLine } from "./Reveal";
 
 export default function Contact() {
   const wordmarkRef = useRef(null);
@@ -60,18 +59,6 @@ export default function Contact() {
   return (
     <section className="section contact" id="contact">
       <div className="shell">
-        <h2 className="contact__lead">
-          <MaskLine>Let&rsquo;s make something worth noticing</MaskLine>
-        </h2>
-
-        <div>
-          <MaskLine delay={0.08}>
-            <a className="contact__mail fx-underline" href={`mailto:${site.email}`} data-cursor="Email">
-              {site.email}
-            </a>
-          </MaskLine>
-        </div>
-
         {/* Oversized name filling the section, edge to edge — like the banner.
             The wrapper owns the spacing and centring; the name itself stays
             inline (as in the banner) so the JS fit measures the real glyph
@@ -81,7 +68,7 @@ export default function Contact() {
             className="wordmark contact__wordmark"
             href={`mailto:${site.email}`}
             ref={wordmarkRef}
-            aria-label="Email me"
+            aria-label={`Email ${site.name}`}
           >
             {site.wordmark}
           </a>

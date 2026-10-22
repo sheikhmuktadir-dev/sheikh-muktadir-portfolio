@@ -42,17 +42,23 @@ export function MaskLine({
     ? { whileInView: "show", viewport: { once: true, margin: "-10% 0px" } }
     : { animate: play ? "show" : "hidden" };
 
+  // The view trigger lives on the clipping WRAPPER, not the sliding span: the
+  // span starts 110% below inside an overflow:hidden box, so an observer on it
+  // always reads "clipped out" and the line never arrived (empty band above the
+  // contact wordmark). The inner span inherits show/hidden via variants.
   return (
-    <span className={["line-mask", className].filter(Boolean).join(" ")}>
+    <motion.span
+      className={["line-mask", className].filter(Boolean).join(" ")}
+      initial="hidden"
+      {...viewProps}
+    >
       <motion.span
         style={{ display: "block", willChange: "transform" }}
         variants={inner}
-        initial="hidden"
-        {...viewProps}
       >
         {children}
       </motion.span>
-    </span>
+    </motion.span>
   );
 }
 
@@ -74,7 +80,17 @@ export function RevealWords({ text, delay = 0, className }) {
       {words.map((word, i) => (
         <span
           key={`${word}-${i}`}
-          style={{ display: "inline-block", overflow: "hidden", verticalAlign: "top" }}
+          style={{
+            display: "inline-block",
+            overflow: "hidden",
+            verticalAlign: "top",
+            // The mask clips at the line box, and at line-height 0.98 that is
+            // above the descender line: g / y / p were cut off. Extend the clip
+            // box below the baseline and pull the next line back up by the
+            // same amount, so spacing is unchanged but descenders survive.
+            padding: "0.04em 0 0.16em",
+            margin: "-0.04em 0 -0.16em",
+          }}
         >
           <motion.span
             style={{ display: "inline-block", willChange: "transform" }}

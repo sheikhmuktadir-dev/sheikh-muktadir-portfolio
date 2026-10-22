@@ -71,7 +71,11 @@
 *::before,
 *::after { box-sizing: border-box; }
 
-html { -webkit-text-size-adjust: 100%; }
+html {
+  /* Always reserve the scrollbar gutter: the preloader, mobile menu and modal
+     toggle body overflow, and without this the page reflowed by the scrollbar
+     width each time (Lighthouse CLS 0.158, all of it the preloader exit). */
+  scrollbar-gutter: stable; -webkit-text-size-adjust: 100%; }
 
 /* Lenis base rules (from lenis/dist/lenis.css). Native smooth scrolling must
    be off while Lenis drives the page, or the two easings fight and the scroll

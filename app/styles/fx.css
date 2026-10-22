@@ -299,6 +299,11 @@
 .fx-slats {
   position: absolute;
   inset: 0;
+  /* 100vw, not the container width: Lighthouse's headless Chrome toggles a
+     15px scrollbar when body overflow is restored during the exit, which
+     re-laid-out these 5 columns mid-animation and was reported as a 0.158
+     layout shift (a real browser records none). vw ignores the scrollbar. */
+  width: 100vw;
   z-index: 0;
   display: grid;
   grid-template-columns: repeat(5, 1fr);

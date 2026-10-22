@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { site } from "@/data/site";
+import { coverSrcSet } from "@/lib/media";
 import Counter from "./fx/Counter";
 import Scramble from "./fx/Scramble";
 import { openProject } from "@/lib/projectModal";
@@ -66,7 +67,16 @@ export default function CaseStudyBlocks({ blockRefs }) {
                 data-cursor="View"
                 onClick={(e) => openProject(i, e.currentTarget)}
               >
-                {item.image ? <img src={item.image} alt="" loading="lazy" /> : null}
+                {item.image ? (
+                  <img
+                    src={item.image}
+                    srcSet={coverSrcSet(item.image)}
+                    sizes="(max-width: 767px) 90vw, 420px"
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                  />
+                ) : null}
               </div>
 
               {/* Floating stat cards over the image — the mobile echo of the
@@ -91,7 +101,7 @@ export default function CaseStudyBlocks({ blockRefs }) {
 
             <div className="cs__copy">
               <span className="cs__year">{item.year}</span>
-              <h3 className="cs__title">{item.title}</h3>
+              <h2 className="cs__title">{item.title}</h2>
               <p className="cs__desc">{item.description}</p>
               {/* Opens the preview modal (gallery + "Visit live site"), so the
                   recruiter never leaves the portfolio by accident. */}

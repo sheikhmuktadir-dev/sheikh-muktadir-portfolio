@@ -276,15 +276,16 @@ ${tex(cv.education.school)}
 /* ----------------------------------------------------------------- build */
 
 const browsers = [
-  "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe",
-  "C:/Program Files/Microsoft/Edge/Application/msedge.exe",
+  // Chrome first: headless Edge was seen exiting 0 without writing the PDF.
   "C:/Program Files/Google/Chrome/Application/chrome.exe",
   "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
   "/usr/bin/google-chrome",
+  "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe",
+  "C:/Program Files/Microsoft/Edge/Application/msedge.exe",
   "/usr/bin/chromium",
 ];
-const browser = browsers.find((p) => existsSync(p));
-if (!browser) {
+const installed = browsers.filter((p) => existsSync(p));
+if (!installed.length) {
   console.error("No Edge/Chrome found to print the PDF.");
   process.exit(1);
 }
@@ -293,26 +294,47 @@ const work = mkdtempSync(join(tmpdir(), "cv-build-"));
 const htmlPath = join(work, "cv.html");
 writeFileSync(htmlPath, html(), "utf8");
 
-const run = spawnSync(
-  browser,
-  [
-    "--headless=new",
-    "--disable-gpu",
-    "--no-first-run",
-    "--no-default-browser-check",
-    "--no-pdf-header-footer",
-    `--user-data-dir=${join(work, "profile")}`,
-    `--print-to-pdf=${PDF_OUT}`,
-    pathToFileURL(htmlPath).href,
-  ],
-  { encoding: "utf8", timeout: 60000 }
-);
-rmSync(work, { recursive: true, force: true });
+// Remove the previous PDF first: headless Edge was seen exiting 0 WITHOUT
+// writing a file (2026-10-23), and the old PDF on disk then passed the
+// "exists" check, so stale CVs shipped as "rebuilt". Try each installed
+// browser until one really produces the file.
+rmSync(PDF_OUT, { force: true });
+let printedWith = null;
+let lastErr = "";
+for (const browser of installed) {
+  const run = spawnSync(
+    browser,
+    [
+      "--headless=new",
+      "--disable-gpu",
+      "--no-first-run",
+      "--no-default-browser-check",
+      "--no-pdf-header-footer",
+      `--user-data-dir=${join(work, "profile")}`,
+      `--print-to-pdf=${PDF_OUT}`,
+      pathToFileURL(htmlPath).href,
+    ],
+    { encoding: "utf8", timeout: 60000 }
+  );
+  if (run.status === 0 && existsSync(PDF_OUT)) {
+    printedWith = browser;
+    break;
+  }
+  lastErr = `${browser}: status ${run.status} ${run.stderr || run.error || "(no PDF written)"}`;
+}
+try {
+  rmSync(work, { recursive: true, force: true, maxRetries: 5, retryDelay: 300 });
+} catch (e) {
+  // A browser that failed to print can leave its profile dir locked briefly;
+  // the temp dir is disposable, so never fail the build over it.
+  console.warn("temp cleanup skipped:", e.code || e.message);
+}
 
-if (run.status !== 0 || !existsSync(PDF_OUT)) {
-  console.error("PDF print failed:", run.stderr || run.error);
+if (!printedWith) {
+  console.error("PDF print failed:", lastErr);
   process.exit(1);
 }
+console.log(`printed with ${printedWith}`);
 
 const pdf = readFileSync(PDF_OUT, "latin1");
 const pages = (pdf.match(/\/Type\s*\/Page(?!s)/g) || []).length;

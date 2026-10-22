@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { site } from "@/data/site";
+import { coverSrcSet } from "@/lib/media";
 import { INTRO_MS } from "@/lib/config";
 import { subscribeScroll } from "@/lib/scroll";
 import { openProject } from "@/lib/projectModal";
@@ -299,7 +300,14 @@ export default function PhoneTrack() {
                 transition={{ duration: 0.55, ease: EASE }}
               >
                 {mediaSrc ? (
-                  <img src={mediaSrc} alt="" />
+                  <img
+                    src={mediaSrc}
+                    srcSet={coverSrcSet(mediaSrc)}
+                    sizes="420px"
+                    alt=""
+                    decoding="async"
+                    fetchPriority={inBanner ? "high" : undefined}
+                  />
                 ) : (
                   <span className="phone__empty">
                     {mediaLabel || (

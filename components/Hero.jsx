@@ -129,7 +129,7 @@ export default function Hero() {
           is hidden and the image simply sits below the text in normal flow
           (scrolls with the page, not sticky). */}
       <div className="hero__figure" aria-hidden="true">
-        {site.heroVisual ? <img src={site.heroVisual} alt="" /> : null}
+        {site.heroVisual ? <img src={site.heroVisual} alt="" fetchPriority="high" decoding="async" /> : null}
       </div>
 
       <motion.span

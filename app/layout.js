@@ -75,7 +75,7 @@ export const metadata = {
     "React Developer Hyderabad",
     "Next.js Developer",
     "React Native Developer",
-    "Immediate Joiner",
+    "Front-End Team Lead",
     site.name,
   ],
   authors: [{ name: site.name }],
@@ -88,6 +88,12 @@ export const metadata = {
     description: site.intro,
     siteName: site.name,
     locale: "en_IN",
+    // og:image + twitter:image come from app/opengraph-image.js automatically.
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${site.name} — ${site.role}`,
+    description: site.intro,
   },
 };
 

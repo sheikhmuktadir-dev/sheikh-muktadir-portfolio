@@ -6,7 +6,8 @@
     "dev": "next dev -p 3007",
     "build": "next build",
     "start": "next start -p 3007",
-    "cv": "node cv/build-cv.mjs"
+    "cv": "node cv/build-cv.mjs",
+    "covers": "node scripts/covers.mjs"
   },
   "dependencies": {
     "framer-motion": "^12.4.7",

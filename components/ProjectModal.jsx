@@ -321,6 +321,19 @@ function Dialog({ item, index }) {
               {item.description}
             </motion.p>
 
+            {/* Modal-only detail list (site.work[i].highlights) — the card shows
+                the paragraph, the modal adds what was actually built. */}
+            {item.highlights?.length ? (
+              <motion.ul className="pm__points" variants={rise}>
+                {item.highlights.map((h) => (
+                  <li className="pm__point" key={h}>
+                    <span className="pm__point-square" aria-hidden="true" />
+                    <span>{h}</span>
+                  </li>
+                ))}
+              </motion.ul>
+            ) : null}
+
             {item.stats?.length ? (
               <motion.ul className="pm__stats" variants={rise}>
                 {item.stats.map((s) => (

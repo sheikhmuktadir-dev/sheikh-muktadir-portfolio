@@ -73,6 +73,7 @@ export default function Nav() {
         id="nav-overlay"
         className={`nav__overlay${open ? " is-open" : ""}`}
         aria-hidden={!open}
+        inert={!open}
       >
         <nav className="nav__overlay-links" aria-label="Primary mobile">
           {site.nav.map((item) => (

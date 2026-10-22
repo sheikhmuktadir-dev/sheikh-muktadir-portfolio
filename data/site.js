@@ -21,16 +21,17 @@ export const site = {
   // Hero headline. Each string is its own line.
   // Each string is its own masked line, so each must FIT the column on one
   // line or it wraps and you get an extra one. Line 1 is the role, line 2 the
-  // availability — together they read as a developer openly looking for a job.
+  // value — what the role delivers. Availability lives in the statement and
+  // footer, never here: the biggest type on the page sells, it never asks.
   // Widths are kept close (~499 / ~531px at the top breakpoint) so the block
   // still stacks evenly. Keep any replacement near that width, under ~780px.
-  headline: ["Front-end developer", "open to full-time work"],
+  headline: ["Front-end developer.", "Figma to production."],
 
   // Short paragraph under the headline — the "why hire me" line. No filler
   // adjectives: years, stack, and the cities a recruiter filters on. Keep it
   // near ~106 characters so it holds three lines in the narrow column.
   intro:
-    "4+ years turning Figma into fast, pixel-perfect React, Next.js and React Native apps — based in Hyderabad.",
+    "4+ years shipping fast, pixel-perfect React, Next.js and React Native apps. Team lead, based in Hyderabad.",
 
   // Image shown inside the sticky phone. Put a file in /public and point here,
   // e.g. "/hero.jpg". Leave empty for the placeholder.
@@ -44,10 +45,10 @@ export const site = {
   // Keep each one at or under ~16 characters so the pills stay the same
   // compact size as the reference ("React & Next.js" was the longest before).
   heroTags: [
-    "4+ Yrs Front-End",
-    "Pixel-Perfect UI",
-    "Immediate Joiner",
-    "React & Next.js",
+    "4+ Yrs Front-End", // years: the first recruiter filter
+    "Web & Mobile", // breadth: React Native, not just web
+    "Team Lead", // seniority: his real title, matches the intro
+    "Open to Full-Time", // availability: lives here, never in the headline
   ],
 
   // Primary action in the header. Drop your PDF at public/cv.pdf, or point
@@ -70,7 +71,7 @@ export const site = {
   // length just needs to stay in that ballpark — much shorter and a line goes
   // thin, much longer and it spills to a fifth line.
   statement:
-    "Give me a Figma file and a deadline — I'll ship a pixel-exact, fast front end in React, Next.js or React Native, on time. 4+ years of proof. Ready for my next team.",
+    "Give me a Figma file and a deadline. You get a pixel-perfect, fast front end, on time, in clean components your team can build on. Ready when you are.",
 
   // About & Experience — a pinned numeral that rolls as each entry takes the
   // view. Step 01 is about me; 02–04 are previous roles.
@@ -78,9 +79,9 @@ export const site = {
   // replace them with your real employers, dates and responsibilities.
   process: {
     label: "About me",
-    heading: "A bit about me and where I've worked",
+    heading: "Who I am and where I've worked",
     intro:
-      "4+ years building fast, pixel-exact front ends in React, Next.js and React Native. Here's who I am and the teams I've done it with.",
+      "Fresher in 2022, team lead today, shipping web and mobile from Figma the whole way. The short version first, then each team.",
     steps: [
       {
         title: "About me",
@@ -88,15 +89,15 @@ export const site = {
         items: [
           {
             label: "Who I am",
-            body: "A B.Tech CSE graduate (2020) and front-end developer who takes products from Figma to production — web in React and Next.js, mobile in React Native.",
+            body: "B.Tech in Computer Science, front-end developer since 2022. Web in React and Next.js, mobile in React Native — the same person covering both ends of a product.",
           },
           {
-            label: "My stack",
-            body: "React, Next.js and React Native at the core — Redux Toolkit for state, Tailwind and Bootstrap for layout, WordPress for content sites. Figma in, pixel-exact UI out.",
+            label: "How I work",
+            body: "I build straight from the Figma file, ship components the team reuses, and check performance before anything goes live. Claude Code and MCP are in my daily loop.",
           },
           {
             label: "Right now",
-            body: "Leading web and mobile at SMCloudMyle and ready for my next full-time front-end role in Hyderabad — immediate joiner, no notice period to serve.",
+            body: "Leading web and mobile at SMCloudMyle — and open to my next full-time front-end role in Hyderabad.",
           },
         ],
       },
@@ -106,15 +107,15 @@ export const site = {
         items: [
           {
             label: "Lead",
-            body: "Lead the front end across web and mobile — I own the component architecture, set the UI standards, and keep the team shipping fast without breaking quality.",
+            body: "Own the front end across web and mobile — the component architecture, the UI standards and the release pace — so the team ships fast without breaking quality.",
           },
           {
             label: "Build",
-            body: "Leading ChessCurve's front end — a live chess-coaching platform with real-time boards, video, chat, homework and Stockfish analysis, built in Next.js from Figma.",
+            body: "ChessCurve, a live chess-coaching platform: three portals (coach, student, admin) with real-time boards, video, chat, homework and Stockfish analysis — every screen built in Next.js from Figma.",
           },
           {
             label: "Performance",
-            body: "Engineer for speed — Stockfish 18 running in the browser, board moves synced live over Socket.IO, and screens that stay smooth with video and chat open.",
+            body: "Built for speed — Stockfish 18 running in the browser, board moves synced live over Socket.IO, and screens that stay smooth with video and chat open.",
           },
         ],
       },
@@ -124,7 +125,7 @@ export const site = {
         items: [
           {
             label: "Built",
-            body: "Shipped customer-facing web apps in React and Next.js for a year and a half — new features and full pages taken from Figma to production, on time.",
+            body: "Delivered customer-facing web apps in React and Next.js — whole pages and new features, owned from design handoff to release.",
           },
           {
             label: "Components",
@@ -132,7 +133,7 @@ export const site = {
           },
           {
             label: "Quality",
-            body: "Owned the front end end to end — fast loads, layouts that held at every screen size, and problems caught before clients ever saw them.",
+            body: "Owned the front end from first commit to release — fast loads, layouts that held at every screen size, and problems caught before clients ever saw them.",
           },
         ],
       },
@@ -142,11 +143,11 @@ export const site = {
         items: [
           {
             label: "Built",
-            body: "Turned Figma designs into clean, responsive websites and web apps in React and JavaScript — shipped straight to production for real clients on real deadlines.",
+            body: "Turned Figma designs into clean, responsive websites and web apps in React and JavaScript, shipped to production for client businesses on fixed deadlines.",
           },
           {
             label: "WordPress",
-            body: "Built custom WordPress themes and Bootstrap layouts the content team could run and update on their own — no developer needed for a new page.",
+            body: "Built custom WordPress themes and Bootstrap layouts — including the ActivPower IRx online store — that the content team could run and update on their own, no developer needed for a new page.",
           },
           {
             label: "Growth",
@@ -160,9 +161,12 @@ export const site = {
   // Tech grid. `icon` is the filename slug of a real logo in /public/icons/
   // (official brand SVGs), rendered as a 3D sticker tile in components/Brands.jsx.
   // 12 tiles = 6x2. Row 1 is the front-end framework stack a recruiter screens
-  // for, row 2 is the foundation + styling/motion/CMS tools. FRONT-END ONLY —
-  // no Node/Express/MongoDB: this is a front-end portfolio and every tile must
+  // for, row 2 is styling/CMS/design/workflow tools. FRONT-END ONLY — no
+  // Node/Express/MongoDB: this is a front-end portfolio and every tile must
   // survive an interview question. No TypeScript/GraphQL/Sass either.
+  // HTML5/CSS3 tiles dropped 2026-10-23: at 4+ years they read as padding (and
+  // stay on the CV for ATS). Claude Code + MCP added instead — AI-assisted
+  // delivery is the 2027 differentiator and he uses both daily.
   brandsLabel: "Tech I work with",
   brands: [
     { name: "React", icon: "react" },
@@ -171,19 +175,20 @@ export const site = {
     { name: "JavaScript", icon: "javascript" },
     { name: "Redux Toolkit", icon: "redux" },
     { name: "Tailwind", icon: "tailwind" },
-    { name: "HTML5", icon: "html5" },
-    { name: "CSS3", icon: "css3" },
     { name: "Bootstrap", icon: "bootstrap" },
     { name: "Figma", icon: "figma" },
     { name: "WordPress", icon: "wordpress" },
     { name: "Git", icon: "git" },
+    { name: "Claude Code", icon: "claude" },
+    { name: "MCP", icon: "mcp" },
   ],
 
   // ---------------------------------------------------------------------------
-  // Projects. ChessCurve and ActivPower IRx are real (and are the CV's Key
-  // Projects in cv/cv-data.mjs). Fitness Tracking App and E-commerce
-  // Storefront are DEMO placeholders the owner will replace with real projects
-  // — keep them, and add each real one to the CV too when it lands.
+  // Projects. ChessCurve and ActivPower IRx are real (the CV's Key Projects in
+  // cv/cv-data.mjs). Fitness Tracking App and E-commerce Storefront are DEMO
+  // placeholders with invented stats — the owner is replacing them with real
+  // personal projects by ~late Nov 2026 (live URL + public repo + real stats).
+  // Add each real one to the CV too when it lands.
   // ---------------------------------------------------------------------------
   // The sticky phone swaps its media as each one scrolls in.
   // Clicking the phone, the cover or "View project" opens the preview modal
@@ -193,8 +198,17 @@ export const site = {
     {
       title: "ChessCurve",
       year: "2026",
+      // Shown ONLY in the preview modal (the card keeps `description`), so
+      // opening a project adds detail instead of repeating the card. Facts
+      // mirror cv/cv-data.mjs Key Projects — keep the two in step.
+      highlights: [
+        "Coach, student and admin portals in Next.js, from Figma.",
+        "Real-time board over Socket.IO, with live video and chat.",
+        "Stockfish 18 in-browser: live evaluation and best moves.",
+        "Homework: puzzles, analysis and theory, with coach review.",
+      ],
       description:
-        "A live chess-coaching platform. Coach and students share a real-time board with video, chat, homework and Stockfish 18 analysis running in the browser. I lead the front end — every screen built in Next.js from Figma, synced live over Socket.IO.",
+        "A live chess-coaching platform. Coach and students share a real-time board with video, chat, homework and Stockfish 18 analysis running in the browser. I lead the front end — every screen built in Next.js from Figma, with the board synced live over Socket.IO.",
       // 3x captures of the local coach app at iPhone size (390x844 → 1170x2532
       // webp, 2026-10-22), with an iPhone status bar baked in: a real puzzle
       // submission review (hw 390 "Double Check", replay at the last move;
@@ -212,7 +226,7 @@ export const site = {
         { value: "Live", label: "In production" },
         { value: "Real-time", label: "Board sync" },
         { value: "3", label: "Portals" },
-        { value: "SF18", label: "Engine in-browser" },
+        { value: "Stockfish", label: "Engine in-browser" },
       ],
       categories: ["Next.js", "React", "Socket.IO"],
     },
@@ -252,8 +266,13 @@ export const site = {
       title: "ActivPower IRx",
       // Built at ZAPS Group (Sep 2022 – May 2024).
       year: "2024",
+      highlights: [
+        "Storefront, product pages and checkout, rebuilt mobile-first.",
+        "Every cart, pricing and subscription flow kept working.",
+        "Shipped twice: IRx and its sister brand, Canis. 14 pages.",
+      ],
       description:
-        "An online supplements store on WordPress. I rebuilt the storefront, product pages and checkout from static designs into the live theme — mobile-first, pixel-exact, every cart and subscription hook still working. Shipped for IRx and its sister brand, Canis.",
+        "An online supplements store on WordPress. I rebuilt the storefront, product pages and checkout from static designs into the live theme — mobile-first, pixel-perfect, with every cart and subscription flow still working. Shipped for IRx and its sister brand, Canis.",
       // Cinematic capture of the live home hero at iPhone size (390x844 @3x →
       // 1170x2532 webp, 2026-10-22): iPhone status bar on top (so the device
       // notch clears the header), hero stretched to full screen, intro
@@ -267,14 +286,16 @@ export const site = {
       ],
       href: "https://activpowerirx.com/",
       tint: "#ededed",
-      // Facts only: page count and product count are from the site build.
+      // Facts only: page count is from the site build; checkout was rebuilt from
+      // static designs into the live theme (see description). "8 Products" was
+      // dropped 2026-10-23 — the client's catalogue size is not his work.
       stats: [
         { value: "Live", label: "Online store" },
         { value: "14", label: "Pages built" },
-        { value: "8", label: "Products" },
+        { value: "Checkout", label: "Rebuilt" },
         { value: "2", label: "Brand sites" },
       ],
-      categories: ["WordPress", "JavaScript", "CSS3"],
+      categories: ["WordPress", "Bootstrap", "JavaScript"],
     },
   ],
 
@@ -282,7 +303,7 @@ export const site = {
   // email link. Must agree with the hero: same role (front-end), same
   // availability. Same length as the original so the column wraps the same.
   footerLead:
-    "Hiring a front-end developer in Hyderabad? I can join immediately — React, Next.js and React Native. Let's talk.",
+    "Hiring a front-end developer in Hyderabad? You've seen the work. One email and we're talking.",
 
   socials: [
     { label: "Email", href: "mailto:sheikhmuktadir.dev@gmail.com" },

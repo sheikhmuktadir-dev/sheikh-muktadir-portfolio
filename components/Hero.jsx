@@ -29,12 +29,13 @@ export default function Hero() {
     const fit = () => {
       const box = el.closest(".hero");
       if (!box) return;
-      // Near-full container width with a real safety margin (20px each side).
-      // The glyph ink can extend past the layout box, and browser zoom / load
-      // timing can make the fit land a little wide — a firm margin guarantees
-      // the wordmark stays inside the container edges on every browser rather
-      // than spilling out on the right. Still reads as full-bleed.
-      const avail = box.clientWidth - 40;
+      // Fit to the container CONTENT box (clientWidth minus the gutter padding)
+      // so the letters land exactly on the same edges as the headline and nav:
+      // not past them, not short of them. The correction loop below measures
+      // the real rendered width, so no extra safety margin is needed.
+      const bs = getComputedStyle(box);
+      const avail =
+        box.clientWidth - parseFloat(bs.paddingLeft) - parseFloat(bs.paddingRight);
       const es = getComputedStyle(el);
       const ctx = document.createElement("canvas").getContext("2d");
       // Measure at a known size, then scale by the ratio.

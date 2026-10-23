@@ -19,9 +19,12 @@ export default function Contact() {
       // overflow the container on screens wider than --container.
       const box = el.closest(".shell");
       if (!box) return;
-      // Safety margin like the banner: glyph ink can extend past the layout
-      // box, so leave room or the name spills outside the container.
-      const avail = box.clientWidth - 40;
+      // Same rule as the banner: fit to the shell CONTENT box (clientWidth
+      // minus the gutter padding) so the name spans exactly the container
+      // edges every other section aligns to - no overhang, no gap.
+      const bs = getComputedStyle(box);
+      const avail =
+        box.clientWidth - parseFloat(bs.paddingLeft) - parseFloat(bs.paddingRight);
       const es = getComputedStyle(el);
       const ctx = document.createElement("canvas").getContext("2d");
       ctx.font = es.fontWeight + " 100px " + es.fontFamily;

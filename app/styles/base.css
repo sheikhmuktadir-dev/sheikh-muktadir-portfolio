@@ -46,6 +46,11 @@
 
   /* Rhythm */
   --container: 1676px;                                /* reference max-width */
+  /* Laptops: keep the desktop proportions. At 1920 the 1676 cap leaves ~122px
+     of ground either side of the container (~87% of the viewport); below
+     that the cap never bit and every section ran edge to edge. Same ratio
+     here (user: "same desktop style container also in laptop"). Tablets and
+     phones keep the full width: the query (after the tokens) only applies from 1024px. */
   --gutter: clamp(1.25rem, 1rem + 1.25vw, 2.5rem);    /* 32px @1280, 40px @1920 */
   /* Section rhythm — one uniform value applied to EVERY section's padding-block,
      so the gap between any two sections is the same (= 2 × this) everywhere.
@@ -147,6 +152,10 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* --- Layout helpers ------------------------------------------------------- */
+
+@media (min-width: 1024px) {
+  :root { --container: min(1676px, 88vw); }
+}
 
 .shell {
   width: 100%;

@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { site } from "@/data/site";
-import { INTRO_MS } from "@/lib/config";
+import { introMs } from "@/lib/config";
 
 const EASE = [0.22, 1, 0.36, 1];
 
@@ -13,7 +13,7 @@ const EASE = [0.22, 1, 0.36, 1];
  * section lives in <PhoneRail /> so it can stay sticky past the banner.
  */
 export default function Hero() {
-  const base = INTRO_MS / 1000;
+  const base = introMs() / 1000;
   const wordmarkRef = useRef(null);
 
   // Size the wordmark so it fills the container exactly.

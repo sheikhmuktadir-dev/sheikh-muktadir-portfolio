@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { INTRO_MS } from "@/lib/config";
+import { INTRO_MS, INTRO_SEEN_KEY, markIntroDone } from "@/lib/config";
 
 const EASE = [0.76, 0, 0.24, 1];
 
@@ -15,7 +15,11 @@ export default function Preloader({ name = "Portfolio" }) {
   const [done, setDone] = useState(false);
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    // Already played this session: the head script hid the overlay before
+    // paint (chrome.css), so there is nothing to count or lock.
+    const seen = document.documentElement.dataset.intro === "seen";
+    if (seen || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      markIntroDone();
       setDone(true);
       return;
     }
@@ -43,6 +47,10 @@ export default function Preloader({ name = "Portfolio" }) {
     const finish = window.setTimeout(() => {
       setCount(100);
       setDone(true);
+      markIntroDone();
+      try {
+        sessionStorage.setItem(INTRO_SEEN_KEY, "1");
+      } catch {}
     }, INTRO_MS);
 
     return () => {

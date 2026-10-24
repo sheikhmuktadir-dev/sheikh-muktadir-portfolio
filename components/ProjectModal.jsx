@@ -31,7 +31,11 @@ export default function ProjectModal() {
 
   // Download + decode every project's screens while the page is idle, so the
   // first open doesn't stall on a network fetch or a big image decode.
+  // Skipped on Data Saver / 2G, where pulling every full-size screen up front
+  // would compete with the page's own images; the modal just loads on open.
   useEffect(() => {
+    const net = navigator.connection;
+    if (net?.saveData || /2g/.test(net?.effectiveType || "")) return undefined;
     const warm = () =>
       site.work.forEach((w) =>
         (w.gallery?.length ? w.gallery : [{ src: w.image }]).forEach((s) => {

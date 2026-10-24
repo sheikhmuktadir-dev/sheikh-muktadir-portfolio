@@ -99,6 +99,18 @@
   align-items: flex-end;
   gap: 12px;
   font-family: var(--font-ui);
+  transition:
+    transform 0.45s var(--ease-out),
+    opacity 0.3s var(--ease-out);
+}
+
+/* Phones: the FAB tucks below the fold while you scroll DOWN (reading) so it
+   never sits on top of copy, and slides back the moment you scroll up.
+   Toggled by ThemePicker; never applied while the panel is open. */
+.tp.tp--tucked {
+  transform: translateY(96px);
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* --- The button ----------------------------------------------------------- */
@@ -215,4 +227,5 @@
 
 @media (prefers-reduced-motion: reduce) {
   .tp-fab::after { animation: none; }
+  .tp { transition: none; }
 }

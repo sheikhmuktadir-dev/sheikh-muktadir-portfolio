@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { subscribeScroll } from "@/lib/scroll";
 
 /**
  * Floating theme picker (light themes only).
@@ -58,6 +59,30 @@ export default function ThemePicker() {
     setAccent(a);
     // Make sure the attribute matches (covers first-ever visit).
     document.documentElement.setAttribute("data-theme", a);
+  }, []);
+
+  // Phones: tuck the FAB away while scrolling down so it never covers the copy
+  // being read; any upward scroll (or the top of the page) brings it back.
+  // A class toggle on the root, not state, so scrolling never re-renders.
+  const openRef = useRef(open);
+  openRef.current = open;
+  useEffect(() => {
+    const phone = window.matchMedia("(max-width: 767px)");
+    let last = window.scrollY;
+    const unsubscribe = subscribeScroll((y) => {
+      const dy = y - last;
+      last = y;
+      const root = rootRef.current;
+      if (!root) return;
+      if (!phone.matches || openRef.current || y < 120) {
+        root.classList.remove("tp--tucked");
+        return;
+      }
+      // Ignore sub-pixel jitter and momentum tails.
+      if (Math.abs(dy) < 4) return;
+      root.classList.toggle("tp--tucked", dy > 0);
+    });
+    return unsubscribe;
   }, []);
 
   // Close on outside click / Escape.

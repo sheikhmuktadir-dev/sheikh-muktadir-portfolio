@@ -14,7 +14,9 @@ import { site } from "@/data/site";
 // Light themes only (dark mode removed 2026-10-21). Ids must match
 // components/ThemePicker.jsx ACCENTS; anything else stored from the old
 // system (violet/rose/gold, pf-mode) falls back to the default.
-const themeBootstrap = `(function(){try{var ok={mono:1,blue:1,green:1,orange:1};var a=localStorage.getItem('pf-accent');if(!ok[a])a='mono';document.documentElement.setAttribute('data-theme',a);localStorage.removeItem('pf-mode');}catch(e){}})();`;
+// It also marks a repeat load in the same tab session (data-intro="seen") so
+// the intro overlay is hidden before paint; see lib/config.js INTRO_SEEN_KEY.
+const themeBootstrap = `(function(){try{var ok={mono:1,blue:1,green:1,orange:1};var a=localStorage.getItem('pf-accent');if(!ok[a])a='mono';document.documentElement.setAttribute('data-theme',a);localStorage.removeItem('pf-mode');}catch(e){}try{if(sessionStorage.getItem('pf-intro'))document.documentElement.setAttribute('data-intro','seen');}catch(e){}})();`;
 
 // Fonts are self-hosted from ./fonts rather than fetched via next/font/google.
 // The Google loader downloads the woff2 files at BUILD time, and that fetch is

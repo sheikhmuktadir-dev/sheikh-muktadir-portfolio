@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { site } from "@/data/site";
 import CtaButton from "./CtaButton";
-import { INTRO_MS } from "@/lib/config";
+import { introMs } from "@/lib/config";
 
 /**
  * Header. On desktop it is the right-aligned links + CTA (the banner headline
@@ -20,7 +20,7 @@ export default function Nav() {
     animate: { opacity: 1, y: 0 },
     transition: {
       duration: 0.8,
-      delay: INTRO_MS / 1000 + delay,
+      delay: introMs() / 1000 + delay,
       ease: [0.22, 1, 0.36, 1],
     },
   });

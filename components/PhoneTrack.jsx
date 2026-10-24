@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { site } from "@/data/site";
 import { coverSrcSet } from "@/lib/media";
-import { INTRO_MS } from "@/lib/config";
+import { introMs } from "@/lib/config";
 import { subscribeScroll } from "@/lib/scroll";
 import { openProject } from "@/lib/projectModal";
 
@@ -283,7 +283,7 @@ export default function PhoneTrack() {
               className="phone"
               initial={{ opacity: 0, y: 70 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.15, delay: INTRO_MS / 1000 + 0.25, ease: EASE }}
+              transition={{ duration: 1.15, delay: introMs() / 1000 + 0.25, ease: EASE }}
             >
               <span className="phone__notch" />
               {/* Keyed swap rather than AnimatePresence, for the same reason
@@ -340,7 +340,7 @@ export default function PhoneTrack() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     transition={{
                       duration: 0.7,
-                      delay: INTRO_MS / 1000 + 0.5 + i * 0.1,
+                      delay: introMs() / 1000 + 0.5 + i * 0.1,
                       ease: EASE,
                     }}
                   >

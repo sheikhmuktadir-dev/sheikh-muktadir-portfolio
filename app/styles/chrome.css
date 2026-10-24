@@ -135,6 +135,12 @@
   overflow: hidden;
 }
 
+/* Repeat load in the same tab session: the intro already played. Hidden
+   before paint by the head script in layout.js, so it never flashes. */
+html[data-intro="seen"] .preloader {
+  display: none;
+}
+
 .preloader__mark {
   align-self: center;
   justify-self: center;
